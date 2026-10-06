@@ -636,12 +636,16 @@ function renderExam(){
   }
   function pickTemp(i, ci){
     if (study && s.revealed[i]) return;
+    if (s.answers[i] === ci){
+      // 검정(확정답)이던 보기를 다시 클릭하면 확정을 풀고 파랑(임시체크)으로 전환 — 검정/파랑 공존 방지
+      delete s.answers[i];
+    }
     const set = s.temp[i] || (s.temp[i] = []);
     const idx = set.indexOf(ci);
     if (idx >= 0) set.splice(idx, 1); else set.push(ci);
     if (!set.length) delete s.temp[i];
     s.cur = i;
-    save(); updateCard(i); refreshOmr(i);
+    save(); updateCard(i); refreshOmr(i); refreshCounts();
   }
 
   function renderPage(){
