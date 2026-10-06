@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>컴활 1급 필기 CBT</title>
+<style>
+:root{
+  --navy:#1f3a68; --blue:#2e5aa8; --blue-l:#e8eef9; --line:#c9d3e3; --bg:#f3f5f9; --text:#1d2433; --muted:#6a7486;
+  --ok:#1f8a4c; --ok-l:#e3f4ea; --ng:#c8322f; --ng-l:#fbe7e6; --warn:#e08a00; --card:#fff;
+  --fs:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",sans-serif;font-size:15px}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+.hidden{display:none!important}
+.pre{white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+
+/* ---------- 홈 ---------- */
+.topbar{background:var(--navy);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:16px}
+.topbar h1{font-size:20px;margin:0;font-weight:700;letter-spacing:-.5px}
+.topbar .sub{opacity:.75;font-size:13px}
+.home{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin-bottom:16px}
+.panel h2{font-size:17px;margin:0 0 12px;color:var(--navy)}
+.mode-row{display:flex;gap:10px;flex-wrap:wrap}
+.mode-btn{flex:1;min-width:220px;text-align:left;border:2px solid var(--line);background:#fff;border-radius:8px;padding:12px 14px}
+.mode-btn b{display:block;font-size:16px;margin-bottom:3px}
+.mode-btn span{color:var(--muted);font-size:13px}
+.mode-btn.on{border-color:var(--blue);background:var(--blue-l)}
+.year-block{display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-top:1px solid #edf0f5}
+.year-block:first-of-type{border-top:0}
+.year-label{width:70px;font-weight:700;color:var(--navy);padding-top:8px;flex-shrink:0}
+.rounds{display:flex;flex-wrap:wrap;gap:8px}
+.round-btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:8px 14px;min-width:110px;text-align:left}
+.round-btn:hover{border-color:var(--blue);background:var(--blue-l)}
+.round-btn small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.round-btn small.done{color:var(--ok)}
+.round-btn small.fail{color:var(--ng)}
+.quick-row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:8px 14px}
+.btn:hover{background:var(--blue-l)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--navy)}
+.btn.danger{color:var(--ng)}
+.btn:disabled{opacity:.45;cursor:default}
+.resume{border-color:var(--warn);background:#fff8ea}
+.hist{width:100%;border-collapse:collapse;font-size:14px}
+.hist th,.hist td{border-bottom:1px solid #edf0f5;padding:7px 6px;text-align:center}
+.hist th{color:var(--muted);font-weight:600}
+.hist td:first-child,.hist th:first-child{text-align:left}
+.pass{color:var(--ok);font-weight:700}.fail{color:var(--ng);font-weight:700}
+
+/* ---------- 시험 화면 ---------- */
+.exam{display:flex;flex-direction:column;height:100vh}
+.ex-head{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 14px;flex-wrap:wrap}
+.ex-title{font-weight:700;font-size:16px}
+.ex-mode{font-size:12px;background:rgba(255,255,255,.18);padding:2px 8px;border-radius:10px}
+.ex-head .grow{flex:1}
+.ex-tools{display:flex;gap:6px;align-items:center;font-size:13px}
+.ex-tools .seg{display:flex;border:1px solid rgba(255,255,255,.35);border-radius:5px;overflow:hidden}
+.ex-tools .seg button{background:transparent;color:#fff;border:0;padding:4px 9px;font-size:13px}
+.ex-tools .seg button.on{background:#fff;color:var(--navy);font-weight:700}
+.timer{font-variant-numeric:tabular-nums;font-size:18px;font-weight:700;background:#0f2447;padding:4px 12px;border-radius:5px;min-width:96px;text-align:center}
+.timer.low{color:#ffb4b0}
+.counts{font-size:13px;opacity:.9}
+.ex-body{flex:1;display:flex;min-height:0}
+.qarea{flex:1;overflow:auto;padding:18px 22px;min-width:0}
+.qgrid{display:grid;gap:18px}
+.qgrid.cols2{grid-template-columns:1fr 1fr}
+.qcard{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px 20px;font-size:var(--fs);line-height:1.65}
+.qcard.cur{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-l)}
+.qsubj{font-size:12px;color:var(--muted);margin-bottom:6px}
+.qstem{font-weight:700;display:flex;gap:6px}
+.qstem .no{flex-shrink:0}
+.qimgs img{display:block;max-width:100%;height:auto;margin:10px 0 4px 22px;border:1px solid #eef1f6}
+.choices{list-style:none;margin:12px 0 0;padding:0}
+.choice{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;border-radius:6px;border:1px solid transparent;cursor:pointer;margin:2px 0}
+.choice:hover{background:#f5f8fd}
+.choice .mk{flex-shrink:0;width:1.5em;height:1.5em;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid #8a95a8;font-size:.85em;margin-top:.1em;font-weight:700;color:#4a5569}
+.choice.sel{background:var(--blue-l);border-color:#b7c8ea}
+.choice.sel .mk{background:var(--blue);border-color:var(--blue);color:#fff}
+.choice.correct{background:var(--ok-l);border-color:#9fd3b3}
+.choice.correct .mk{background:var(--ok);border-color:var(--ok);color:#fff}
+.choice.wrong{background:var(--ng-l);border-color:#efb1ae}
+.choice.wrong .mk{background:var(--ng);border-color:var(--ng);color:#fff}
+.choice .tag{margin-left:auto;font-size:12px;font-weight:700;flex-shrink:0;padding-left:8px}
+.choice.locked{cursor:default}
+.choice-img-note{color:var(--muted);font-size:.9em}
+.expl{margin-top:12px;border-left:4px solid var(--blue);background:#f4f7fc;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.95em}
+.expl .ans{font-weight:700;margin-bottom:4px}
+.expl .ans.ok{color:var(--ok)}.expl .ans.ng{color:var(--ng)}
+.expl img{max-width:100%;display:block;margin:8px 0}
+.qactions{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.qactions .btn{padding:4px 10px;font-size:13px}
+.flag-on{color:var(--warn);border-color:var(--warn)}
+
+.omr{width:250px;flex-shrink:0;background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column}
+.omr h3{margin:0;padding:10px 12px;font-size:14px;background:var(--blue-l);color:var(--navy);border-bottom:1px solid var(--line)}
+.omr-list{overflow:auto;flex:1;padding:4px 6px 10px}
+.omr-sub{font-size:12px;color:var(--muted);padding:8px 4px 3px;font-weight:700}
+.omr-row{display:flex;align-items:center;gap:3px;padding:2px 4px;border-radius:4px}
+.omr-row.cur{background:#fff3d6}
+.omr-row .n{width:26px;text-align:right;font-size:12px;color:#4a5569;cursor:pointer;padding-right:4px;font-variant-numeric:tabular-nums}
+.omr-row .n.flag{color:var(--warn);font-weight:700}
+.omr-row button{width:24px;height:22px;border-radius:11px;border:1px solid #a9b4c6;background:#fff;font-size:11px;padding:0;color:#4a5569}
+.omr-row button.sel{background:#222;color:#fff;border-color:#222}
+.omr-row button.correct{background:var(--ok);border-color:var(--ok);color:#fff}
+.omr-row button.wrong{background:var(--ng);border-color:var(--ng);color:#fff}
+.omr-row button.answer{box-shadow:0 0 0 2px var(--ok) inset}
+
+.ex-foot{background:#fff;border-top:1px solid var(--line);display:flex;gap:8px;padding:8px 14px;align-items:center;flex-wrap:wrap}
+.ex-foot .grow{flex:1}
+.pageinfo{color:var(--muted);font-size:13px}
+
+/* ---------- 결과 ---------- */
+.res{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+.scorebox{display:flex;gap:16px;flex-wrap:wrap;align-items:stretch}
+.verdict{flex:0 0 200px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;color:#fff}
+.verdict.pass{background:var(--ok)}.verdict.fail{background:var(--ng)}.verdict.neutral{background:var(--blue)}
+.verdict b{font-size:30px}
+.verdict span{font-size:13px;opacity:.9;margin-top:4px;text-align:center}
+.scoretbl{flex:1;min-width:280px;border-collapse:collapse;background:#fff}
+.scoretbl th,.scoretbl td{border:1px solid var(--line);padding:9px;text-align:center}
+.scoretbl th{background:var(--blue-l);color:var(--navy)}
+.filter{display:flex;gap:6px;margin:18px 0 10px;flex-wrap:wrap;align-items:center}
+.filter .btn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.review .qcard{margin-bottom:14px}
+
+/* ---------- 모달 ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(10,20,40,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal{background:#fff;border-radius:10px;max-width:460px;width:100%;padding:22px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.modal h3{margin:0 0 10px;color:var(--navy)}
+.modal .body{margin-bottom:16px;line-height:1.6}
+.modal .acts{display:flex;justify-content:flex-end;gap:8px}
+.unans{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.unans button{border:1px solid var(--line);background:#fff;border-radius:4px;padding:3px 8px;font-size:13px}
+
+@media (max-width:820px){
+  .omr{display:none}
+  .qgrid.cols2{grid-template-columns:1fr}
+  .qarea{padding:12px}
+  .ex-tools .hide-sm{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="data.js"></script>
+<script>
+(function(){
+'use strict';
+const DATA = window.CBT_DATA || [];
+const CIRC = ['①','②','③','④'];
+const SUBJ = {1:'컴퓨터 일반', 2:'스프레드시트 일반', 3:'데이터베이스 일반'};
+const EXAM_SEC = 60 * 60;
+const app = document.getElementById('app');
+const byId = {}; DATA.forEach(e => { byId[e.id] = e; });
+
+// ---------- 저장소 (실패해도 동작하도록) ----------
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('cbt1.' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('cbt1.' + k, JSON.stringify(v)); } catch(e){} },
+  del(k){ try { localStorage.removeItem('cbt1.' + k); } catch(e){} }
+};
+const prefs = Object.assign({mode:'exam', fs:16, per:1}, store.get('prefs', {}));
+function savePrefs(){ store.set('prefs', prefs); }
+
+// ---------- 유틸 ----------
+function h(tag, attrs, ...kids){
+  const el = document.createElement(tag);
+  if (attrs) for (const k in attrs){
+    const v = attrs[k];
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'text') el.textContent = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (k === 'style') el.setAttribute('style', v);
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const kid of kids.flat()){
+    if (kid == null || kid === false) continue;
+    el.appendChild(typeof kid === 'string' || typeof kid === 'number' ? document.createTextNode(String(kid)) : kid);
+  }
+  return el;
+}
+function getQ(ref){ const e = byId[ref.e]; return e && e.questions[ref.no - 1]; }
+function examTitle(e){ return `${e.year}년 상시 ${String(e.round).padStart(2,'0')}회`; }
+function fmtTime(s){ s = Math.max(0, Math.floor(s)); const m = Math.floor(s/60), r = s % 60; return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`; }
+function fmtDate(t){ const d = new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function isCorrect(q, sel){ return sel != null && q.answerIdx.includes(sel); }
+function imgEl(im){ return h('img', {src: im.src, alt: '문제 그림', loading: 'lazy', style: `max-width:min(100%, ${im.w}px)`}); }
+
+let session = null;   // 진행 중인 시험
+let timerId = null;
+let lastResult = null;
+
+// ---------- 모달 ----------
+function modal(title, body, actions){
+  const bg = h('div', {class:'modal-bg'});
+  const close = () => bg.remove();
+  const box = h('div', {class:'modal'},
+    h('h3', {text:title}),
+    h('div', {class:'body'}, body),
+    h('div', {class:'acts'}, actions.map(a => h('button', {class:'btn ' + (a.cls || ''), onclick: () => { close(); a.fn && a.fn(); }}, a.label)))
+  );
+  bg.appendChild(box);
+  bg.addEventListener('click', e => { if (e.target === bg) close(); });
+  document.body.appendChild(bg);
+  const p = box.querySelector('.btn.primary'); if (p) p.focus();
+  return close;
+}
+
+// ================= 홈 =================
+function renderHome(){
+  stopTimer();
+  document.onkeydown = null;
+  app.innerHTML = '';
+  const hist = store.get('history', []);
+  const wrong = store.get('wrong', {});
+  const wrongCount = Object.keys(wrong).length;
+  const saved = store.get('session', null);
+
+  const top = h('div', {class:'topbar'}, h('h1', {text:'컴퓨터활용능력 1급 필기 CBT'}),
+    h('span', {class:'sub', text:`기출 ${DATA.length}회 · ${DATA.length * 60}문항`}));
+
+  const home = h('div', {class:'home'});
+
+  if (saved && !saved.finished){
+    const answered = Object.keys(saved.answers).length;
+    home.appendChild(h('div', {class:'panel resume'},
+      h('h2', {text:'이어서 풀기'}),
+      h('div', {style:'display:flex;gap:10px;align-items:center;flex-wrap:wrap'},
+        h('span', null, `${saved.title} · ${saved.mode === 'exam' ? '실전 CBT' : '학습 모드'} · ${answered}/${saved.qs.length}문항 표기`,
+          saved.mode === 'exam' ? ` · 남은 시간 ${fmtTime(saved.timeLeft)}` : ''),
+        h('span', {style:'flex:1'}),
+        h('button', {class:'btn primary', onclick: () => { session = saved; renderExam(); }}, '이어서 풀기'),
+        h('button', {class:'btn danger', onclick: () => { store.del('session'); renderHome(); }}, '버리기'))));
+  }
+
+  // 모드 선택
+  const modes = [
+    {k:'exam', t:'실전 CBT 모드', d:'60분 제한시간 · 제출 후 채점 · 과락(40점)/합격(평균 60점) 판정'},
+    {k:'study', t:'학습 모드', d:'보기를 고르면 바로 정답과 해설 확인 · 시간 제한 없음'}
+  ];
+  home.appendChild(h('div', {class:'panel'},
+    h('h2', {text:'1. 풀이 방식 선택'}),
+    h('div', {class:'mode-row'}, modes.map(m => h('button', {class:'mode-btn' + (prefs.mode === m.k ? ' on' : ''),
+      onclick: () => { prefs.mode = m.k; savePrefs(); renderHome(); }}, h('b', {text:m.t}), h('span', {text:m.d}))))));
+
+  // 회차 선택
+  const bestOf = {};
+  hist.forEach(r => { if (r.examId){ const b = bestOf[r.examId]; if (!b || r.avg > b.avg) bestOf[r.examId] = r; } });
+  const years = [...new Set(DATA.map(e => e.year))].sort((a,b) => b - a);
+  const sel = h('div', {class:'panel'}, h('h2', {text:'2. 기출 회차 선택'}));
+  years.forEach(y => {
+    const row = h('div', {class:'rounds'});
+    DATA.filter(e => e.year === y).forEach(e => {
+      const b = bestOf[e.id];
+      row.appendChild(h('button', {class:'round-btn', onclick: () => startExam(e.id)},
+        `상시 ${String(e.round).padStart(2,'0')}회`,
+        b ? h('small', {class: b.pass ? 'done' : 'fail', text:`최고 ${b.avg}점 ${b.pass ? '합격' : '불합격'}`}) : h('small', {text:'60문항'})));
+    });
+    sel.appendChild(h('div', {class:'year-block'}, h('div', {class:'year-label', text:`${y}년`}), row));
+  });
+  home.appendChild(sel);
+
+  // 기타 모의고사
+  home.appendChild(h('div', {class:'panel'},
+    h('h2', {text:'3. 랜덤 · 과목별 · 오답노트'}),
+    h('div', {class:'quick-row'},
+      h('button', {class:'btn primary', onclick: startRandom}, '랜덤 모의고사 (과목별 20문항)'),
+      [1,2,3].map(s => h('button', {class:'btn', onclick: () => startSubject(s)}, `${s}과목 ${SUBJ[s]} 20문항`)),
+      h('button', {class:'btn', disabled: wrongCount === 0 ? true : null, onclick: startWrong}, `오답노트 풀기 (${wrongCount}문항)`),
+      wrongCount ? h('button', {class:'btn danger', onclick: () => modal('오답노트 비우기', '저장된 오답을 모두 삭제할까요?', [
+        {label:'취소'}, {label:'삭제', cls:'primary', fn: () => { store.set('wrong', {}); renderHome(); }}])}, '오답노트 비우기') : null
+    ),
+    h('p', {style:'color:var(--muted);font-size:13px;margin:10px 0 0', text:'틀린 문제는 자동으로 오답노트에 저장되고, 오답노트에서 맞히면 목록에서 빠집니다.'})));
+
+  // 기록
+  if (hist.length){
+    const tbl = h('table', {class:'hist'},
+      h('tr', null, ['시험','일시','방식','1과목','2과목','3과목','평균','판정'].map(t => h('th', {text:t}))));
+    hist.slice().reverse().slice(0, 30).forEach(r => {
+      tbl.appendChild(h('tr', null,
+        h('td', {text:r.title}), h('td', {text:fmtDate(r.date)}), h('td', {text:r.mode === 'exam' ? '실전' : '학습'}),
+        [1,2,3].map(s => h('td', {text: r.subj[s] != null ? r.subj[s] : '-', class: r.subj[s] != null && r.subj[s] < 40 ? 'fail' : null})),
+        h('td', {text:r.avg}),
+        h('td', {class: r.pass == null ? null : (r.pass ? 'pass' : 'fail'), text: r.pass == null ? '-' : (r.pass ? '합격' : '불합격')})));
+    });
+    home.appendChild(h('div', {class:'panel'},
+      h('div', {style:'display:flex;align-items:center'}, h('h2', {text:'응시 기록', style:'flex:1;margin:0 0 12px'}),
+        h('button', {class:'btn danger', style:'padding:4px 10px;font-size:13px', onclick: () => modal('기록 삭제', '응시 기록을 모두 삭제할까요?', [
+          {label:'취소'}, {label:'삭제', cls:'primary', fn: () => { store.set('history', []); renderHome(); }}])}, '기록 삭제')),
+      tbl));
+  }
+
+  app.append(top, home);
+  window.scrollTo(0, 0);
+}
+
+// ================= 세션 생성 =================
+function newSession(title, qs, extra){
+  if (!qs.length) return;
+  const saved = store.get('session', null);
+  const go = () => {
+    session = Object.assign({title, mode: prefs.mode, qs, answers:{}, revealed:{}, flags:{}, cur:0,
+      timeLeft: EXAM_SEC, elapsed: 0, started: Date.now(), finished:false}, extra || {});
+    store.set('session', session);
+    renderExam();
+  };
+  if (saved && !saved.finished && Object.keys(saved.answers).length){
+    modal('새 시험 시작', `진행 중인 "${saved.title}" 시험이 있습니다. 버리고 새로 시작할까요?`, [{label:'취소'}, {label:'새로 시작', cls:'primary', fn: go}]);
+  } else go();
+}
+function startExam(id){
+  const e = byId[id];
+  newSession(examTitle(e), e.questions.map(q => ({e: id, no: q.no})), {examId: id});
+}
+function poolBySubject(s){
+  const out = [];
+  DATA.forEach(e => e.questions.forEach(q => { if (q.subject === s) out.push({e: e.id, no: q.no}); }));
+  return out;
+}
+function startRandom(){
+  const qs = [1,2,3].flatMap(s => shuffle(poolBySubject(s)).slice(0, 20));
+  newSession('랜덤 모의고사', qs);
+}
+function startSubject(s){
+  newSession(`${s}과목 ${SUBJ[s]} 랜덤 20문항`, shuffle(poolBySubject(s)).slice(0, 20));
+}
+function startWrong(){
+  const wrong = store.get('wrong', {});
+  const qs = Object.keys(wrong).map(k => { const [e, no] = k.split('#'); return {e, no: +no}; })
+    .filter(r => getQ(r))
+    .sort((a, b) => getQ(a).subject - getQ(b).subject);
+  newSession('오답노트', qs, {wrongNote: true});
+}
+
+// ================= 시험 화면 =================
+function save(){ if (session) store.set('session', session); }
+function stopTimer(){ if (timerId){ clearInterval(timerId); timerId = null; } }
+
+function renderExam(){
+  stopTimer();
+  app.innerHTML = '';
+  const s = session;
+  const total = s.qs.length;
+  const study = s.mode === 'study';
+  document.documentElement.style.setProperty('--fs', prefs.fs + 'px');
+
+  // 헤더
+  const timerEl = h('div', {class:'timer'});
+  const countsEl = h('div', {class:'counts'});
+  const segFs = h('div', {class:'seg'}, [[14,'작게'],[16,'보통'],[19,'크게']].map(([v, t]) =>
+    h('button', {class: prefs.fs === v ? 'on' : null, onclick: () => { prefs.fs = v; savePrefs(); renderExam(); }}, t)));
+  const segPer = h('div', {class:'seg'}, [[1,'1문제'],[2,'2문제'],[0,'전체']].map(([v, t]) =>
+    h('button', {class: prefs.per === v ? 'on' : null, onclick: () => { prefs.per = v; savePrefs(); renderExam(); }}, t)));
+  const head = h('div', {class:'ex-head'},
+    h('div', {class:'ex-title', text:s.title}),
+    h('span', {class:'ex-mode', text: study ? '학습 모드' : '실전 CBT'}),
+    h('div', {class:'grow'}),
+    h('div', {class:'ex-tools'}, h('span', {class:'hide-sm', text:'글자크기'}), segFs, h('span', {class:'hide-sm', text:'화면배치'}), segPer),
+    countsEl, timerEl);
+
+  // 본문
+  const qarea = h('div', {class:'qarea'});
+  const omrList = h('div', {class:'omr-list'});
+  const omr = h('div', {class:'omr'}, h('h3', {text:'답안 표기란'}), omrList);
+  const body = h('div', {class:'ex-body'}, qarea, omr);
+
+  // 하단
+  const pageInfo = h('span', {class:'pageinfo'});
+  const prevBtn = h('button', {class:'btn', onclick: () => move(-1)}, '◀ 이전');
+  const nextBtn = h('button', {class:'btn', onclick: () => move(1)}, '다음 ▶');
+  const foot = h('div', {class:'ex-foot'},
+    h('button', {class:'btn', onclick: confirmExit}, '홈으로'),
+    h('button', {class:'btn', onclick: showUnanswered}, '안 푼 문제'),
+    h('div', {class:'grow'}),
+    prevBtn, pageInfo, nextBtn,
+    h('div', {class:'grow'}),
+    h('button', {class:'btn primary', onclick: confirmSubmit}, '답안 제출'));
+
+  app.append(h('div', {class:'exam'}, head, body, foot));
+
+  const per = prefs.per;
+  function pageOf(i){ return per === 0 ? 0 : Math.floor(i / per); }
+  const pages = per === 0 ? 1 : Math.ceil(total / per);
+
+  // OMR 구성
+  const omrRows = [];
+  let lastSubj = null;
+  s.qs.forEach((ref, i) => {
+    const q = getQ(ref);
+    if (q.subject !== lastSubj){ lastSubj = q.subject; omrList.appendChild(h('div', {class:'omr-sub', text:`${q.subject}과목 ${SUBJ[q.subject]}`})); }
+    const btns = CIRC.map((c, ci) => h('button', {title:`${i+1}번 ${c}`, onclick: () => { pick(i, ci); goto(i); }}, String(ci + 1)));
+    const n = h('span', {class:'n', onclick: () => goto(i)}, String(i + 1));
+    const row = h('div', {class:'omr-row'}, n, btns);
+    omrRows.push({row, btns, n});
+    omrList.appendChild(row);
+  });
+
+  function refreshOmr(i){
+    const q = getQ(s.qs[i]); const a = s.answers[i]; const r = omrRows[i];
+    const rev = study && s.revealed[i];
+    r.btns.forEach((b, ci) => {
+      b.className = '';
+      if (rev){
+        if (ci === a) b.className = isCorrect(q, a) ? 'correct' : 'wrong';
+        else if (q.answerIdx.includes(ci)) b.className = 'answer';
+      } else if (ci === a) b.className = 'sel';
+    });
+    r.n.className = 'n' + (s.flags[i] ? ' flag' : '');
+    r.row.classList.toggle('cur', i === s.cur);
+  }
+  function refreshCounts(){
+    const done = Object.keys(s.answers).length;
+    let extra = '';
+    if (study){
+      const rev = Object.keys(s.revealed).map(Number);
+      const ok = rev.filter(i => isCorrect(getQ(s.qs[i]), s.answers[i])).length;
+      extra = ` · 맞힘 ${ok}/${rev.length}`;
+    }
+    countsEl.textContent = `전체 ${total} · 안 푼 문제 ${total - done}${extra}`;
+  }
+
+  // 문제 카드
+  function questionCard(i){
+    const ref = s.qs[i]; const q = getQ(ref);
+    const card = h('div', {class:'qcard', id:'q' + i});
+    const origin = s.examId ? '' : ` · ${examTitle(byId[ref.e])} ${ref.no}번`;
+    card.appendChild(h('div', {class:'qsubj', text:`${q.subject}과목 ${SUBJ[q.subject]}${origin}`}));
+    card.appendChild(h('div', {class:'qstem'}, h('span', {class:'no', text:`${i + 1}.`}), h('span', {class:'pre', text:q.stem})));
+    const topImgs = q.imgs.filter(im => im.after == null);
+    if (topImgs.length) card.appendChild(h('div', {class:'qimgs'}, topImgs.map(imgEl)));
+    const ul = h('ul', {class:'choices'});
+    CIRC.forEach((c, ci) => {
+      const txt = q.choicesInImage ? h('span', {class:'choice-img-note', text:'(위 그림의 보기 참고)'}) : h('span', {class:'pre', text:q.choices[ci]});
+      const li = h('li', {class:'choice', onclick: () => pick(i, ci)}, h('span', {class:'mk', text:String(ci + 1)}), txt);
+      ul.appendChild(li);
+      q.imgs.filter(im => im.after === ci).forEach(im => ul.appendChild(h('li', {class:'qimgs'}, imgEl(im))));
+    });
+    card.appendChild(ul);
+    const acts = h('div', {class:'qactions'});
+    const flagBtn = h('button', {class:'btn' + (s.flags[i] ? ' flag-on' : ''), onclick: () => {
+      s.flags[i] = !s.flags[i]; if (!s.flags[i]) delete s.flags[i]; save(); updateCard(i); refreshOmr(i);
+    }}, s.flags[i] ? '★ 표시됨' : '☆ 나중에 다시 보기');
+    acts.appendChild(flagBtn);
+    if (study) acts.appendChild(h('button', {class:'btn', onclick: () => { s.revealed[i] = true; save(); updateCard(i); refreshOmr(i); refreshCounts(); }}, '정답 보기'));
+    card.appendChild(acts);
+    const explBox = h('div');
+    card.appendChild(explBox);
+    card._ul = ul; card._explBox = explBox; card._flag = flagBtn;
+    paintCard(card, i);
+    return card;
+  }
+  function paintCard(card, i){
+    const q = getQ(s.qs[i]); const a = s.answers[i];
+    const rev = study && s.revealed[i];
+    [...card._ul.querySelectorAll('.choice')].forEach((li, ci) => {
+      li.className = 'choice';
+      const oldTag = li.querySelector('.tag'); if (oldTag) oldTag.remove();
+      if (rev){
+        if (q.answerIdx.includes(ci)){ li.classList.add('correct'); li.appendChild(h('span', {class:'tag', style:'color:var(--ok)', text:'정답'})); }
+        else if (ci === a){ li.classList.add('wrong'); li.appendChild(h('span', {class:'tag', style:'color:var(--ng)', text:'내 답'})); }
+      } else if (ci === a) li.classList.add('sel');
+    });
+    card._explBox.innerHTML = '';
+    if (rev) card._explBox.appendChild(explBlock(q, a));
+    card._flag.textContent = s.flags[i] ? '★ 표시됨' : '☆ 나중에 다시 보기';
+    card._flag.className = 'btn' + (s.flags[i] ? ' flag-on' : '');
+    card.classList.toggle('cur', per !== 1 && i === s.cur);
+  }
+  const cards = {};
+  function updateCard(i){ if (cards[i]) paintCard(cards[i], i); }
+
+  function pick(i, ci){
+    if (study && s.revealed[i]) return; // 학습 모드: 확인 후에는 고정
+    if (s.answers[i] === ci && !study) delete s.answers[i];   // 같은 보기 다시 누르면 취소
+    else s.answers[i] = ci;
+    if (study) s.revealed[i] = true;
+    s.cur = i;
+    save(); updateCard(i); refreshOmr(i); refreshCounts();
+  }
+
+  function renderPage(){
+    qarea.innerHTML = '';
+    for (const k in cards) delete cards[k];
+    const p = pageOf(s.cur);
+    const from = per === 0 ? 0 : p * per, to = per === 0 ? total : Math.min(total, from + per);
+    const grid = h('div', {class:'qgrid' + (per === 2 ? ' cols2' : '')});
+    for (let i = from; i < to; i++){ cards[i] = questionCard(i); grid.appendChild(cards[i]); }
+    qarea.appendChild(grid);
+    pageInfo.textContent = per === 0 ? `${s.cur + 1} / ${total}` : `${p + 1} / ${pages} 페이지`;
+    prevBtn.disabled = per === 0 ? s.cur === 0 : p === 0;
+    nextBtn.disabled = per === 0 ? s.cur === total - 1 : p === pages - 1;
+    qarea.scrollTop = 0;
+  }
+  function goto(i){
+    const prevPage = pageOf(s.cur), old = s.cur;
+    s.cur = Math.max(0, Math.min(total - 1, i));
+    if (per === 0 || pageOf(s.cur) === prevPage){
+      updateCard(old); updateCard(s.cur);
+      if (per === 0){ pageInfo.textContent = `${s.cur + 1} / ${total}`; prevBtn.disabled = s.cur === 0; nextBtn.disabled = s.cur === total - 1; }
+      const el = document.getElementById('q' + s.cur);
+      if (el && per !== 1) el.scrollIntoView({block:'nearest', behavior:'smooth'});
+    } else renderPage();
+    refreshOmr(old); refreshOmr(s.cur);
+    const r = omrRows[s.cur].row; r.scrollIntoView({block:'nearest'});
+    save();
+  }
+  function move(d){
+    if (per === 0) goto(s.cur + d);
+    else goto((pageOf(s.cur) + d) * per);
+  }
+
+  document.onkeydown = e => {
+    if (document.querySelector('.modal-bg')) return;
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key >= '1' && e.key <= '4'){ pick(s.cur, +e.key - 1); e.preventDefault(); }
+    else if (e.key === 'ArrowRight'){ if (per === 0 || per === 2) goto(s.cur + 1); else move(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft'){ if (per === 0 || per === 2) goto(s.cur - 1); else move(-1); e.preventDefault(); }
+  };
+
+  function showUnanswered(){
+    const list = s.qs.map((_, i) => i).filter(i => s.answers[i] == null);
+    const flagged = s.qs.map((_, i) => i).filter(i => s.flags[i]);
+    const body = h('div', null,
+      list.length ? h('div', null, `안 푼 문제 ${list.length}개`, h('div', {class:'unans'}, list.map(i => h('button', {onclick: () => { document.querySelector('.modal-bg').remove(); goto(i); }}, String(i + 1)))))
+        : h('div', {text:'모든 문제에 답을 표기했습니다.'}),
+      flagged.length ? h('div', {style:'margin-top:12px'}, `★ 표시한 문제 ${flagged.length}개`, h('div', {class:'unans'}, flagged.map(i => h('button', {onclick: () => { document.querySelector('.modal-bg').remove(); goto(i); }}, String(i + 1))))) : null);
+    modal('안 푼 문제', body, [{label:'닫기', cls:'primary'}]);
+  }
+  function confirmSubmit(){
+    const left = total - Object.keys(s.answers).length;
+    modal('답안 제출', left ? `안 푼 문제가 ${left}개 있습니다. 그래도 제출하시겠습니까?` : '답안을 제출하시겠습니까? 제출 후에는 답을 바꿀 수 없습니다.',
+      [{label:'취소'}, {label:'제출', cls:'primary', fn: finish}]);
+  }
+  function confirmExit(){
+    modal('홈으로', '현재 풀이 상태는 저장되어 나중에 이어서 풀 수 있습니다.', [{label:'취소'}, {label:'홈으로', cls:'primary', fn: () => { save(); renderHome(); }}]);
+  }
+
+  // 타이머
+  function tick(){
+    if (study){ timerEl.textContent = fmtTime(s.elapsed); timerEl.title = '경과 시간'; }
+    else { timerEl.textContent = fmtTime(s.timeLeft); timerEl.classList.toggle('low', s.timeLeft <= 300); timerEl.title = '남은 시간'; }
+  }
+  let lastT = Date.now();
+  timerId = setInterval(() => {
+    const now = Date.now(); const d = (now - lastT) / 1000; lastT = now;
+    s.elapsed += d;
+    if (!study){
+      s.timeLeft -= d;
+      if (s.timeLeft <= 0){ s.timeLeft = 0; tick(); stopTimer(); modal('시간 종료', '시험 시간이 종료되어 자동으로 제출되었습니다.', [{label:'결과 보기', cls:'primary', fn: () => renderResult()}]); finish(true); return; }
+    }
+    tick();
+    if (Math.round(s.elapsed) % 5 === 0) save();
+  }, 1000);
+
+  s.qs.forEach((_, i) => refreshOmr(i));
+  refreshCounts(); tick(); renderPage();
+  omrRows[s.cur].row.scrollIntoView({block:'nearest'});
+}
+
+// ================= 채점 =================
+function grade(s){
+  const subj = {};
+  s.qs.forEach((ref, i) => {
+    const q = getQ(ref);
+    const o = subj[q.subject] || (subj[q.subject] = {total:0, ok:0});
+    o.total++; if (isCorrect(q, s.answers[i])) o.ok++;
+  });
+  const scores = {};
+  Object.keys(subj).forEach(k => { scores[k] = Math.round(subj[k].ok / subj[k].total * 100); });
+  const okAll = Object.values(subj).reduce((a, o) => a + o.ok, 0);
+  const avg = Math.round(okAll / s.qs.length * 100 * 10) / 10;
+  const full = [1,2,3].every(k => subj[k] && subj[k].total === 20);
+  const pass = full ? ([1,2,3].every(k => scores[k] >= 40) && avg >= 60) : null;
+  return {subj, scores, avg, okAll, pass, full};
+}
+
+function finish(silent){
+  stopTimer();
+  const s = session;
+  s.finished = true;
+  const g = grade(s);
+  // 오답노트 갱신
+  const wrong = store.get('wrong', {});
+  s.qs.forEach((ref, i) => {
+    const key = ref.e + '#' + ref.no; const q = getQ(ref);
+    if (isCorrect(q, s.answers[i])){ if (s.wrongNote) delete wrong[key]; }
+    else wrong[key] = {n: ((wrong[key] && wrong[key].n) || 0) + 1, t: Date.now()};
+  });
+  store.set('wrong', wrong);
+  const hist = store.get('history', []);
+  hist.push({title: s.title, examId: s.examId || null, mode: s.mode, date: Date.now(), subj: g.scores, avg: g.avg, pass: g.pass,
+    time: Math.round(s.elapsed)});
+  store.set('history', hist.slice(-200));
+  store.del('session');
+  lastResult = {s, g};
+  if (!silent) renderResult();
+}
+
+// ================= 결과 =================
+function explBlock(q, a){
+  const ok = isCorrect(q, a);
+  return h('div', {class:'expl'},
+    h('div', {class:'ans ' + (a == null ? '' : ok ? 'ok' : 'ng')},
+      `정답 ${q.answerIdx.map(i => CIRC[i]).join(', ')}`, a == null ? ' · 선택 안 함' : ` · 내 답 ${CIRC[a]} ${ok ? '(정답)' : '(오답)'}`),
+    h('div', {class:'pre', text:q.expl}),
+    q.explImgs.map(imgEl));
+}
+
+function renderResult(){
+  document.onkeydown = null;
+  const {s, g} = lastResult;
+  app.innerHTML = '';
+  const top = h('div', {class:'topbar'}, h('h1', {text:'채점 결과'}), h('span', {class:'sub', text:s.title}));
+  const res = h('div', {class:'res'});
+
+  const vcls = g.pass == null ? 'neutral' : g.pass ? 'pass' : 'fail';
+  const failSubj = [1,2,3].filter(k => g.scores[k] != null && g.scores[k] < 40);
+  const verdict = h('div', {class:'verdict ' + vcls},
+    h('b', {text: g.pass == null ? `${g.avg}점` : g.pass ? '합격' : '불합격'}),
+    h('span', {text: g.pass == null ? `${g.okAll} / ${s.qs.length} 정답` :
+      `평균 ${g.avg}점` + (failSubj.length ? ` · ${failSubj.join(', ')}과목 과락` : g.avg < 60 ? ' · 평균 60점 미만' : '')}));
+  const tbl = h('table', {class:'scoretbl'},
+    h('tr', null, ['과목','문항 수','맞힌 수','점수','판정'].map(t => h('th', {text:t}))));
+  [1,2,3].forEach(k => {
+    const o = g.subj[k]; if (!o) return;
+    const sc = g.scores[k];
+    tbl.appendChild(h('tr', null, h('td', {text:`${k}과목 ${SUBJ[k]}`}), h('td', {text:o.total}), h('td', {text:o.ok}),
+      h('td', {text:sc}), h('td', {class: sc < 40 ? 'fail' : 'pass', text: sc < 40 ? '과락' : '통과'})));
+  });
+  tbl.appendChild(h('tr', null, h('th', {text:'합계'}), h('th', {text:s.qs.length}), h('th', {text:g.okAll}), h('th', {text:`평균 ${g.avg}`}),
+    h('th', {text: `${Math.floor(s.elapsed / 60)}분 ${Math.round(s.elapsed % 60)}초`})));
+  res.appendChild(h('div', {class:'scorebox'}, verdict, tbl));
+
+  const wrongIdx = s.qs.map((_, i) => i).filter(i => !isCorrect(getQ(s.qs[i]), s.answers[i]));
+  res.appendChild(h('div', {class:'filter'},
+    h('button', {class:'btn', onclick: renderHome}, '홈으로'),
+    s.examId ? h('button', {class:'btn', onclick: () => startExam(s.examId)}, '같은 회차 다시 풀기') : null,
+    wrongIdx.length ? h('button', {class:'btn primary', onclick: () => newSession(`${s.title} 오답 다시 풀기`, wrongIdx.map(i => s.qs[i]), {wrongNote: true})}, `틀린 ${wrongIdx.length}문제 다시 풀기`) : null,
+    h('span', {style:'flex:1'}),
+    h('span', {style:'color:var(--muted);font-size:13px', text:'해설 보기:'}),
+    ...['전체','틀린 문제','★ 표시'].map((t, k) => h('button', {class:'btn' + (k === (lastResult.filter || 0) ? ' on' : ''), onclick: () => { lastResult.filter = k; renderResult(); }}, t))));
+
+  const review = h('div', {class:'review'});
+  const f = lastResult.filter || 0;
+  s.qs.forEach((ref, i) => {
+    const q = getQ(ref); const a = s.answers[i];
+    if (f === 1 && isCorrect(q, a)) return;
+    if (f === 2 && !s.flags[i]) return;
+    const card = h('div', {class:'qcard'});
+    card.appendChild(h('div', {class:'qsubj', text:`${q.subject}과목 ${SUBJ[q.subject]} · ${examTitle(byId[ref.e])} ${ref.no}번`}));
+    card.appendChild(h('div', {class:'qstem'}, h('span', {class:'no', text:`${i + 1}.`}), h('span', {class:'pre', text:q.stem})));
+    const topImgs = q.imgs.filter(im => im.after == null);
+    if (topImgs.length) card.appendChild(h('div', {class:'qimgs'}, topImgs.map(imgEl)));
+    const ul = h('ul', {class:'choices'});
+    CIRC.forEach((c, ci) => {
+      let cls = 'choice locked', tag = null;
+      if (q.answerIdx.includes(ci)){ cls += ' correct'; tag = h('span', {class:'tag', style:'color:var(--ok)', text: ci === a ? '정답 · 내 답' : '정답'}); }
+      else if (ci === a){ cls += ' wrong'; tag = h('span', {class:'tag', style:'color:var(--ng)', text:'내 답'}); }
+      ul.appendChild(h('li', {class:cls}, h('span', {class:'mk', text:String(ci + 1)}),
+        q.choicesInImage ? h('span', {class:'choice-img-note', text:'(위 그림의 보기 참고)'}) : h('span', {class:'pre', text:q.choices[ci]}), tag));
+      q.imgs.filter(im => im.after === ci).forEach(im => ul.appendChild(h('li', {class:'qimgs'}, imgEl(im))));
+    });
+    card.appendChild(ul);
+    card.appendChild(explBlock(q, a));
+    review.appendChild(card);
+  });
+  if (!review.children.length) review.appendChild(h('div', {class:'panel', text:'해당하는 문제가 없습니다.'}));
+  res.appendChild(review);
+  app.append(top, res);
+  window.scrollTo(0, 0);
+}
+
+if (!DATA.length){
+  app.appendChild(h('div', {class:'home'}, h('div', {class:'panel', text:'data.js 를 불러오지 못했습니다. index.html 과 같은 폴더에 data.js 가 있는지 확인하세요.'})));
+} else renderHome();
+})();
+</script>
+</body>
+</html>
