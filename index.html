@@ -94,6 +94,8 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .choice .mk{flex-shrink:0;width:1.4em;height:1.4em;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1.3px solid #6b7688;font-size:.85em;margin-top:.1em;font-weight:700;color:#334}
 .choice.sel{background:#eef2f7}
 .choice.sel .mk{background:#1a1a1a;border-color:#1a1a1a;color:#fff}
+.choice.temp{background:#e8f0fd}
+.choice.temp .mk{background:#2e5aa8;border-color:#2e5aa8;color:#fff}
 .choice.correct{background:var(--ok-l)}
 .choice.correct .mk{background:var(--ok);border-color:var(--ok);color:#fff}
 .choice.wrong{background:var(--ng-l)}
@@ -119,6 +121,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .omr-row .n.flag{color:var(--ng);font-weight:700}
 .omr-row button{width:18px;height:18px;border-radius:50%;border:1.3px solid #7f96ae;background:#fff;font-size:9px;padding:0;color:#334;font-weight:700}
 .omr-row button.sel{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.omr-row button.temp{background:#2e5aa8;color:#fff;border-color:#2e5aa8}
 .omr-row button.correct{background:var(--ok);border-color:var(--ok);color:#fff}
 .omr-row button.wrong{background:var(--ng);border-color:var(--ng);color:#fff}
 .omr-row button.answer{box-shadow:0 0 0 2px var(--ok) inset}
@@ -397,7 +400,7 @@ function newSession(title, qs, extra){
   if (!qs.length) return;
   const saved = store.get('session', null);
   const go = () => {
-    session = Object.assign({title, mode: prefs.mode, qs, answers:{}, revealed:{}, flags:{}, cur:0,
+    session = Object.assign({title, mode: prefs.mode, qs, answers:{}, revealed:{}, flags:{}, temp:{}, cur:0,
       timeLeft: EXAM_SEC, elapsed: 0, started: Date.now(), finished:false}, extra || {});
     store.set('session', session);
     renderExam();
@@ -438,6 +441,7 @@ function renderExam(){
   stopTimer();
   app.innerHTML = '';
   const s = session;
+  s.temp = s.temp || {};
   const total = s.qs.length;
   const study = s.mode === 'study';
   document.documentElement.style.setProperty('--fs', prefs.fs + 'px');
@@ -541,6 +545,7 @@ function renderExam(){
 
   function refreshOmr(i){
     const q = getQ(s.qs[i]); const a = s.answers[i]; const r = omrRows[i];
+    const tmp = s.temp[i] || [];
     const rev = study && s.revealed[i];
     r.btns.forEach((b, ci) => {
       b.className = '';
@@ -548,6 +553,7 @@ function renderExam(){
         if (ci === a) b.className = isCorrect(q, a) ? 'correct' : 'wrong';
         else if (q.answerIdx.includes(ci)) b.className = 'answer';
       } else if (ci === a) b.className = 'sel';
+      else if (tmp.includes(ci)) b.className = 'temp';
     });
     r.n.className = 'n' + (s.flags[i] ? ' flag' : '');
     r.row.classList.toggle('cur', i === s.cur);
@@ -576,7 +582,10 @@ function renderExam(){
     const ul = h('ul', {class:'choices'});
     CIRC.forEach((c, ci) => {
       const txt = q.choicesInImage ? h('span', {class:'choice-img-note', text:'(위 그림의 보기 참고)'}) : h('span', {class:'pre', text:q.choices[ci]});
-      const li = h('li', {class:'choice', onclick: () => pick(i, ci)}, h('span', {class:'mk', text:String(ci + 1)}), txt);
+      const li = h('li', {class:'choice',
+        onclick: () => study ? pick(i, ci) : pickTemp(i, ci),
+        oncontextmenu: e => { e.preventDefault(); if (!study) pick(i, ci); }
+      }, h('span', {class:'mk', text:String(ci + 1)}), txt);
       ul.appendChild(li);
       q.imgs.filter(im => im.after === ci).forEach(im => ul.appendChild(h('li', {class:'qimgs'}, imgEl(im))));
     });
@@ -596,6 +605,7 @@ function renderExam(){
   }
   function paintCard(card, i){
     const q = getQ(s.qs[i]); const a = s.answers[i];
+    const tmp = s.temp[i] || [];
     const rev = study && s.revealed[i];
     [...card._ul.querySelectorAll('.choice')].forEach((li, ci) => {
       li.className = 'choice';
@@ -604,6 +614,7 @@ function renderExam(){
         if (q.answerIdx.includes(ci)){ li.classList.add('correct'); li.appendChild(h('span', {class:'tag', style:'color:var(--ok)', text:'정답'})); }
         else if (ci === a){ li.classList.add('wrong'); li.appendChild(h('span', {class:'tag', style:'color:var(--ng)', text:'내 답'})); }
       } else if (ci === a) li.classList.add('sel');
+      else if (tmp.includes(ci)) li.classList.add('temp');
     });
     card._explBox.innerHTML = '';
     if (rev) card._explBox.appendChild(explBlock(q, a));
@@ -618,9 +629,19 @@ function renderExam(){
     if (study && s.revealed[i]) return; // 학습 모드: 확인 후에는 고정
     if (s.answers[i] === ci && !study) delete s.answers[i];   // 같은 보기 다시 누르면 취소
     else s.answers[i] = ci;
+    delete s.temp[i];   // 정답을 확정하면 임시체크는 모두 지움
     if (study) s.revealed[i] = true;
     s.cur = i;
     save(); updateCard(i); refreshOmr(i); refreshCounts();
+  }
+  function pickTemp(i, ci){
+    if (study && s.revealed[i]) return;
+    const set = s.temp[i] || (s.temp[i] = []);
+    const idx = set.indexOf(ci);
+    if (idx >= 0) set.splice(idx, 1); else set.push(ci);
+    if (!set.length) delete s.temp[i];
+    s.cur = i;
+    save(); updateCard(i); refreshOmr(i);
   }
 
   function renderPage(){
