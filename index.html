@@ -108,15 +108,15 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .qactions .btn{padding:4px 10px;font-size:13px}
 .flag-on{color:var(--warn);border-color:var(--warn)}
 
-.omr{width:220px;flex-shrink:0;background:#fff;border-left:1px solid #d3dae6;display:flex;flex-direction:column}
-.omr h3{margin:0;padding:8px 12px;font-size:14px;background:#fff;color:#1a1a1a;border-bottom:1px solid #d3dae6;letter-spacing:3px;text-align:center;font-weight:700}
-.omr-list{overflow:auto;flex:1;padding:4px 10px 10px}
-.omr-sub{font-size:11px;color:#56708c;padding:6px 2px 2px;font-weight:700}
-.omr-row{display:flex;align-items:center;gap:5px;padding:2px 2px}
+.omr{width:220px;flex-shrink:0;background:#fff;border-left:1px solid #8a96ab;display:flex;flex-direction:column}
+.omr h3{margin:0;padding:7px 12px;font-size:13px;background:#dce6f0;color:#0d3d78;border-bottom:1px solid #8a96ab;letter-spacing:1px;text-align:center;font-weight:700}
+.omr-list{overflow:auto;flex:1;padding:0}
+.omr-sub{font-size:11px;color:#0d3d78;padding:4px 10px;font-weight:700;background:#eef3f9;border-bottom:1px solid #d3dae6}
+.omr-row{display:flex;align-items:center;gap:6px;padding:3px 10px;border-bottom:1px solid #eceff4}
 .omr-row.cur{background:#fcefc0}
-.omr-row .n{width:18px;text-align:right;font-size:12px;color:#1d2433;cursor:pointer;font-variant-numeric:tabular-nums;font-weight:700}
+.omr-row .n{width:22px;text-align:left;font-size:12px;color:#1d2433;cursor:pointer;font-variant-numeric:tabular-nums;font-weight:700}
 .omr-row .n.flag{color:var(--ng);font-weight:700}
-.omr-row button{width:19px;height:19px;border-radius:50%;border:1.3px solid #6b7688;background:#fff;font-size:10px;padding:0;color:#334;font-weight:700}
+.omr-row button{width:18px;height:18px;border-radius:50%;border:1.3px solid #8a96ab;background:#fff;font-size:9px;padding:0;color:#334;font-weight:700}
 .omr-row button.sel{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
 .omr-row button.correct{background:var(--ok);border-color:var(--ok);color:#fff}
 .omr-row button.wrong{background:var(--ng);border-color:var(--ng);color:#fff}
@@ -206,7 +206,7 @@ const store = {
   set(k, v){ try { localStorage.setItem('cbt1.' + k, JSON.stringify(v)); } catch(e){} },
   del(k){ try { localStorage.removeItem('cbt1.' + k); } catch(e){} }
 };
-const prefs = Object.assign({mode:'exam', fs:16, per:1}, store.get('prefs', {}));
+const prefs = Object.assign({mode:'exam', fs:15, per:5}, store.get('prefs', {}));
 function savePrefs(){ store.set('prefs', prefs); }
 
 // ---------- 유틸 ----------
@@ -446,7 +446,7 @@ function renderExam(){
   const countsEl = h('div', {class:'counts'});
   const segFs = h('div', {class:'seg'}, [[14,'작게'],[16,'보통'],[19,'크게']].map(([v, t]) =>
     h('button', {class: prefs.fs === v ? 'on' : null, onclick: () => { prefs.fs = v; savePrefs(); renderExam(); }}, t)));
-  const segPer = h('div', {class:'seg'}, [[1,'1문제'],[2,'2문제'],[0,'전체']].map(([v, t]) =>
+  const segPer = h('div', {class:'seg'}, [[1,'1문제'],[5,'5문제'],[10,'10문제'],[0,'전체']].map(([v, t]) =>
     h('button', {class: prefs.per === v ? 'on' : null, onclick: () => { prefs.per = v; savePrefs(); renderExam(); }}, t)));
   const subjInExam = [...new Set(s.qs.map(ref => getQ(ref).subject))].sort();
   const subjSel = h('select', {class:'subjsel', onchange: e => {
