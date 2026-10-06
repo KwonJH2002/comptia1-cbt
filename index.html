@@ -109,15 +109,15 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .qactions .btn{padding:4px 10px;font-size:13px}
 .flag-on{color:var(--warn);border-color:var(--warn)}
 
-.omr{width:220px;flex-shrink:0;background:#fff;border-left:1px solid #8a96ab;display:flex;flex-direction:column}
-.omr h3{margin:0;padding:7px 12px;font-size:13px;background:#dce6f0;color:#0d3d78;border-bottom:1px solid #8a96ab;letter-spacing:1px;text-align:center;font-weight:700}
-.omr-list{overflow:auto;flex:1;padding:0}
-.omr-sub{font-size:11px;color:#0d3d78;padding:4px 10px;font-weight:700;background:#eef3f9;border-bottom:1px solid #d3dae6}
-.omr-row{display:flex;align-items:center;gap:6px;padding:3px 10px;border-bottom:1px solid #eceff4}
-.omr-row.cur{background:#fcefc0}
+.omr{width:220px;flex-shrink:0;background:#d7e4f2;border-left:1px solid #7f96ae;display:flex;flex-direction:column}
+.omr h3{margin:0;padding:7px 12px;font-size:13px;background:#9fbcdc;color:#0d3d78;border-bottom:1px solid #7f96ae;letter-spacing:1px;text-align:center;font-weight:700}
+.omr-list{overflow:auto;flex:1;padding:4px 6px}
+.omr-sub{font-size:11px;color:#0d3d78;padding:4px 8px;font-weight:700;background:#bcd2ea;border-radius:2px;margin-bottom:2px}
+.omr-row{display:flex;align-items:center;gap:6px;padding:3px 8px;background:#eef4fa;border:1px solid #c3d4e8;border-radius:2px;margin-bottom:2px}
+.omr-row.cur{background:#fcefc0;border-color:#e0b84a}
 .omr-row .n{width:22px;text-align:left;font-size:12px;color:#1d2433;cursor:pointer;font-variant-numeric:tabular-nums;font-weight:700}
 .omr-row .n.flag{color:var(--ng);font-weight:700}
-.omr-row button{width:18px;height:18px;border-radius:50%;border:1.3px solid #8a96ab;background:#fff;font-size:9px;padding:0;color:#334;font-weight:700}
+.omr-row button{width:18px;height:18px;border-radius:50%;border:1.3px solid #7f96ae;background:#fff;font-size:9px;padding:0;color:#334;font-weight:700}
 .omr-row button.sel{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
 .omr-row button.correct{background:var(--ok);border-color:var(--ok);color:#fff}
 .omr-row button.wrong{background:var(--ng);border-color:var(--ng);color:#fff}
@@ -207,7 +207,7 @@ const store = {
   set(k, v){ try { localStorage.setItem('cbt1.' + k, JSON.stringify(v)); } catch(e){} },
   del(k){ try { localStorage.removeItem('cbt1.' + k); } catch(e){} }
 };
-const prefs = Object.assign({mode:'exam', fs:15, per:5}, store.get('prefs', {}));
+const prefs = Object.assign({mode:'exam', fs:15, per:'auto'}, store.get('prefs', {}));
 function savePrefs(){ store.set('prefs', prefs); }
 
 // ---------- 유틸 ----------
@@ -447,7 +447,7 @@ function renderExam(){
   const countsEl = h('div', {class:'counts'});
   const segFs = h('div', {class:'seg'}, [[14,'작게'],[16,'보통'],[19,'크게']].map(([v, t]) =>
     h('button', {class: prefs.fs === v ? 'on' : null, onclick: () => { prefs.fs = v; savePrefs(); renderExam(); }}, t)));
-  const segPer = h('div', {class:'seg'}, [[1,'1문제'],[5,'5문제'],[10,'10문제'],[0,'전체']].map(([v, t]) =>
+  const segPer = h('div', {class:'seg'}, [['auto','자동맞춤'],[1,'1문제씩']].map(([v, t]) =>
     h('button', {class: prefs.per === v ? 'on' : null, onclick: () => { prefs.per = v; savePrefs(); renderExam(); }}, t)));
   const subjInExam = [...new Set(s.qs.map(ref => getQ(ref).subject))].sort();
   const subjSel = h('select', {class:'subjsel', onchange: e => {
@@ -493,9 +493,38 @@ function renderExam(){
 
   app.append(h('div', {class:'exam'}, head, body, foot));
 
-  const per = prefs.per;
-  function pageOf(i){ return per === 0 ? 0 : Math.floor(i / per); }
-  const pages = per === 0 ? 1 : Math.ceil(total / per);
+  const per = prefs.per; // 'auto' (화면에 맞춰 자동 배치) | 1 (문제별 1페이지)
+  let autoRanges = null;
+  function computeAutoPages(){
+    const availH = Math.max(100, qarea.clientHeight - 4);
+    const colW = Math.max(120, (qarea.clientWidth - 40 - 24) / 2); // 40=qarea 좌우 패딩, 24=열 사이 간격
+    const measDiv = h('div', {style:`position:absolute;visibility:hidden;left:-9999px;top:0;width:${colW}px`});
+    document.body.appendChild(measDiv);
+    const ranges = [];
+    let i = 0;
+    while (i < total){
+      const from = i; const left = [], right = [];
+      let hL = 0, hR = 0, placed = 0;
+      while (i < total){
+        const card = questionCard(i);
+        measDiv.appendChild(card);
+        const ch = card.offsetHeight;
+        measDiv.removeChild(card);
+        const useLeft = hL <= hR;
+        const newH = (useLeft ? hL : hR) + ch;
+        if (newH > availH && placed > 0) break;
+        if (useLeft){ hL = newH; left.push(i); } else { hR = newH; right.push(i); }
+        i++; placed++;
+      }
+      if (placed === 0){ left.push(i); i++; } // 안전장치: 한 문제도 못 들어가면 강제로 1개는 배치
+      ranges.push({from, to:i, left, right});
+    }
+    document.body.removeChild(measDiv);
+    return ranges;
+  }
+  if (per === 'auto') autoRanges = computeAutoPages();
+  function pageCount(){ return per === 'auto' ? autoRanges.length : total; }
+  function pageOf(i){ return per === 'auto' ? autoRanges.findIndex(r => i >= r.from && i < r.to) : i; }
 
   // OMR 구성
   const omrRows = [];
@@ -580,7 +609,7 @@ function renderExam(){
     if (rev) card._explBox.appendChild(explBlock(q, a));
     card._flag.textContent = s.flags[i] ? '★ 표시됨' : '☆ 나중에 다시 보기';
     card._flag.className = 'btn' + (s.flags[i] ? ' flag-on' : '');
-    card.classList.toggle('cur', per !== 1 && i === s.cur);
+    card.classList.toggle('cur', per === 'auto' && i === s.cur);
   }
   const cards = {};
   function updateCard(i){ if (cards[i]) paintCard(cards[i], i); }
@@ -598,50 +627,45 @@ function renderExam(){
     qarea.innerHTML = '';
     for (const k in cards) delete cards[k];
     const p = pageOf(s.cur);
-    const from = per === 0 ? 0 : p * per, to = per === 0 ? total : Math.min(total, from + per);
-    const idxs = []; for (let i = from; i < to; i++) idxs.push(i);
     let container;
-    if (per > 1){
-      // 실제 CBT처럼 왼쪽 열을 먼저 채우고 오른쪽 열로 넘어가는 2단 배치 (좌: 7,8 / 우: 9,10 식)
-      const half = Math.ceil(idxs.length / 2);
+    if (per === 'auto'){
+      const {left, right} = autoRanges[p];
       const colL = h('div', {class:'qcol'}), colR = h('div', {class:'qcol'});
-      idxs.slice(0, half).forEach(i => { cards[i] = questionCard(i); colL.appendChild(cards[i]); });
-      idxs.slice(half).forEach(i => { cards[i] = questionCard(i); colR.appendChild(cards[i]); });
-      container = h('div', {class:'qgrid cols2'}, colL, colR);
+      left.forEach(i => { cards[i] = questionCard(i); colL.appendChild(cards[i]); });
+      right.forEach(i => { cards[i] = questionCard(i); colR.appendChild(cards[i]); });
+      container = right.length ? h('div', {class:'qgrid cols2'}, colL, colR) : h('div', {class:'qgrid'}, colL);
     } else {
       container = h('div', {class:'qgrid'});
-      idxs.forEach(i => { cards[i] = questionCard(i); container.appendChild(cards[i]); });
+      cards[p] = questionCard(p); container.appendChild(cards[p]);
     }
     qarea.appendChild(container);
-    pageInfo.textContent = per === 0 ? `${s.cur + 1} / ${total}` : `${p + 1} / ${pages} 페이지`;
-    prevBtn.disabled = per === 0 ? s.cur === 0 : p === 0;
-    nextBtn.disabled = per === 0 ? s.cur === total - 1 : p === pages - 1;
+    pageInfo.textContent = `${p + 1} / ${pageCount()} 페이지`;
+    prevBtn.disabled = p === 0;
+    nextBtn.disabled = p === pageCount() - 1;
     qarea.scrollTop = 0;
   }
   function goto(i){
     const prevPage = pageOf(s.cur), old = s.cur;
     s.cur = Math.max(0, Math.min(total - 1, i));
-    if (per === 0 || pageOf(s.cur) === prevPage){
+    if (pageOf(s.cur) === prevPage){
       updateCard(old); updateCard(s.cur);
-      if (per === 0){ pageInfo.textContent = `${s.cur + 1} / ${total}`; prevBtn.disabled = s.cur === 0; nextBtn.disabled = s.cur === total - 1; }
-      const el = document.getElementById('q' + s.cur);
-      if (el && per !== 1) el.scrollIntoView({block:'nearest', behavior:'smooth'});
     } else renderPage();
     refreshOmr(old); refreshOmr(s.cur);
     const r = omrRows[s.cur].row; r.scrollIntoView({block:'nearest'});
     save();
   }
   function move(d){
-    if (per === 0) goto(s.cur + d);
-    else goto((pageOf(s.cur) + d) * per);
+    const p = Math.max(0, Math.min(pageCount() - 1, pageOf(s.cur) + d));
+    const target = per === 'auto' ? autoRanges[p].from : p;
+    goto(target);
   }
 
   document.onkeydown = e => {
     if (document.querySelector('.modal-bg')) return;
     if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
     if (e.key >= '1' && e.key <= '4'){ pick(s.cur, +e.key - 1); e.preventDefault(); }
-    else if (e.key === 'ArrowRight'){ if (per === 0 || per === 2) goto(s.cur + 1); else move(1); e.preventDefault(); }
-    else if (e.key === 'ArrowLeft'){ if (per === 0 || per === 2) goto(s.cur - 1); else move(-1); e.preventDefault(); }
+    else if (e.key === 'ArrowRight'){ move(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft'){ move(-1); e.preventDefault(); }
   };
 
   function showUnanswered(){
