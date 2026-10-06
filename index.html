@@ -54,38 +54,35 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .hist td:first-child,.hist th:first-child{text-align:left}
 .pass{color:var(--ok);font-weight:700}.fail{color:var(--ng);font-weight:700}
 
-/* ---------- 시험 화면 (실제 상공회의소 CBT 체험 화면 스타일: 흰 배경 + 플랫) ---------- */
-.exam{display:flex;flex-direction:column;height:100vh;background:#fff;font-family:"Dotum","돋움","Gulim","굴림","Malgun Gothic",sans-serif}
-.ex-head{display:flex;flex-direction:column;background:#fff}
-.ex-row1{background:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap}
-.ex-stripe{height:4px;background:linear-gradient(90deg,#3a7bd5,#5cb85c,#f0ad4e,#d9534f)}
-.ex-brand{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #9cc3e0;border-radius:4px;padding:6px 14px;font-weight:700;color:#1a4a7a;font-size:14px}
-.ex-brand .dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7ec8ff,#1a4a7a);flex-shrink:0}
-.ex-row1 .grow{flex:1}
-.ex-infobox{background:#fff;border:1px solid #bcc6d6;border-radius:3px;padding:3px 12px;font-size:11px;color:#56708c;text-align:center}
-.ex-infobox b{display:block;font-size:13px;color:#1a1a1a;font-weight:700}
-.ex-timerbox{text-align:center}
-.lbl{font-size:11px;color:#56708c;margin-bottom:1px}
-.subjsel{font-size:12px;border:1px solid #9cc3e0;padding:2px 4px;background:#fff;font-weight:700;color:#1a1a1a}
-.ex-title{font-weight:700;font-size:16px}
-.ex-mode{font-size:11px;color:#56708c}
-.ex-row2{background:#fff;color:#334;display:flex;align-items:center;gap:10px;padding:2px 16px 8px;flex-wrap:wrap;border-bottom:1px solid #d3dae6}
-.ex-row2 .grow{flex:1}
-.ex-tools{display:flex;gap:6px;align-items:center;font-size:12px;color:#56708c}
-.ex-tools .seg{display:flex;border:1px solid #b9c4d6;border-radius:3px;overflow:hidden}
-.ex-tools .seg button{background:#fff;color:#334;border:0;padding:3px 8px;font-size:12px;border-right:1px solid #b9c4d6}
-.ex-tools .seg button:last-child{border-right:0}
-.ex-tools .seg button.on{background:#dde8f3;font-weight:700}
-.timer{font-variant-numeric:tabular-nums;font-size:28px;font-weight:700;color:var(--led);min-width:120px;text-align:center;font-family:"Malgun Gothic",sans-serif}
+/* ---------- 시험 화면 (실제 상공회의소 CBT 체험 화면 복제) ---------- */
+.exam{display:flex;flex-direction:column;height:100vh;background:#fff;font-family:"Gulim","굴림","Dotum","돋움","Malgun Gothic",sans-serif;font-size:13px;color:#1a1a1a}
+.ex-head{display:flex;flex-direction:column;background:#fff;flex-shrink:0}
+.ex-top{background:#fff;display:flex;align-items:flex-start;gap:10px;padding:8px 10px 6px;flex-wrap:wrap}
+.ex-brand{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #7fa8d9;border-radius:10px;padding:5px 12px;font-weight:700;color:#0d3d78;font-size:13px}
+.ex-brand .dot{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8fd4ff,#1a6fc4 60%,#0d3d78);flex-shrink:0}
+.ex-top .grow{flex:1}
+.ex-subjbox,.ex-timerbox{text-align:center;min-width:80px}
+.ex-subjbox .lbl,.ex-timerbox .lbl{font-size:11px;color:#333;margin-bottom:2px}
+.subjsel{font-size:12px;border:1px solid #8a96ab;padding:2px 2px;background:#fff;font-weight:700;color:#1a1a1a;width:100%}
+.timer{font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;color:var(--led);line-height:1;font-family:"Gulim","Malgun Gothic",sans-serif}
 .timer.low{animation:blink 1s step-start infinite}
 @keyframes blink{50%{opacity:.35}}
-.counts{font-size:12px;color:#56708c}
+.ex-info{background:#fff;border-top:1px solid #c7cedb;border-bottom:1px solid #c7cedb;padding:4px 12px;font-size:12px;color:#222;display:flex;gap:18px}
+.ex-info b{color:#0d3d78;font-weight:700;margin-right:4px}
+.ex-row2{background:#fff;color:#334;display:flex;align-items:center;gap:10px;padding:4px 10px;flex-wrap:wrap;border-bottom:1px solid #e3e7ee}
+.ex-row2 .grow{flex:1}
+.ex-tools{display:flex;gap:6px;align-items:center;font-size:11px;color:#56708c}
+.ex-tools .seg{display:flex;border:1px solid #b9c4d6;border-radius:3px;overflow:hidden}
+.ex-tools .seg button{background:#fff;color:#334;border:0;padding:2px 7px;font-size:11px;border-right:1px solid #b9c4d6}
+.ex-tools .seg button:last-child{border-right:0}
+.ex-tools .seg button.on{background:#dde8f3;font-weight:700}
+.counts{font-size:11px;color:#56708c}
 .ex-body{flex:1;display:flex;min-height:0}
-.qarea{flex:1;overflow:auto;padding:16px 24px;min-width:0;background:#fff}
+.qarea{flex:1;overflow:auto;padding:14px 20px;min-width:0;background:#fff}
 .qgrid{display:grid;gap:0}
 .qgrid.cols2{grid-template-columns:1fr 1fr;gap:0 24px}
-.qcard{background:#fff;border:0;border-bottom:1px solid #e3e7ee;border-radius:0;padding:16px 4px;font-size:var(--fs);line-height:1.7;box-shadow:none}
-.qcard.cur{background:#fcfbf3}
+.qcard{background:#fff;border:0;border-bottom:1px solid #e9ecf2;border-radius:0;padding:14px 2px;font-size:var(--fs);line-height:1.75;box-shadow:none}
+.qcard.cur{background:#fffef0}
 .qsubj{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:700}
 .qstem{font-weight:700;display:flex;gap:6px}
 .qstem .no{flex-shrink:0}
@@ -456,19 +453,21 @@ function renderExam(){
     const target = +e.target.value;
     const i = s.qs.findIndex(ref => getQ(ref).subject === target);
     if (i >= 0) goto(i);
-  }}, subjInExam.map(k => h('option', {value:k, text:`${k}과목 ${SUBJ[k]}`})));
-  const row1 = h('div', {class:'ex-row1'},
-    h('div', {class:'ex-brand'}, h('span', {class:'dot'}), '컴퓨터활용능력 1급 필기 CBT'),
+  }}, subjInExam.map(k => h('option', {value:k, text:SUBJ[k]})));
+
+  const top = h('div', {class:'ex-top'},
+    h('div', {class:'ex-brand'}, h('span', {class:'dot'}), '대한상공회의소 국가기술자격검정 CBT'),
     h('div', {class:'grow'}),
-    h('div', {class:'ex-infobox'}, h('b', {text:s.title}), study ? '학습 모드' : '실전 CBT'),
-    subjInExam.length > 1 ? h('div', {class:'ex-infobox'}, h('div', {class:'lbl', text:'과목명'}), subjSel) : null,
+    h('div', {class:'ex-subjbox'}, h('div', {class:'lbl', text:'과목명'}), subjSel),
     h('div', {class:'ex-timerbox'}, h('div', {class:'lbl', text: study ? '경과 시간' : '남은 시험시간'}), timerEl));
+  const info = h('div', {class:'ex-info'},
+    h('span', null, h('b', {text:'시험명'}), s.title),
+    h('span', null, h('b', {text:'응시방식'}), study ? '학습 모드' : '실전 CBT'));
   const row2 = h('div', {class:'ex-row2'},
     h('div', {class:'ex-tools'}, h('span', {class:'hide-sm', text:'글자크기'}), segFs, h('span', {class:'hide-sm', text:'화면배치'}), segPer),
     h('div', {class:'grow'}),
     countsEl);
-  const stripe = h('div', {class:'ex-stripe'});
-  const head = h('div', {class:'ex-head'}, row1, stripe, row2);
+  const head = h('div', {class:'ex-head'}, top, info, row2);
 
   // 본문
   const qarea = h('div', {class:'qarea'});
