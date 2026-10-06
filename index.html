@@ -65,7 +65,8 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .ex-infobox{background:#fff;border:1px solid #bcc6d6;border-radius:3px;padding:3px 12px;font-size:11px;color:#56708c;text-align:center}
 .ex-infobox b{display:block;font-size:13px;color:#1a1a1a;font-weight:700}
 .ex-timerbox{text-align:center}
-.ex-timerbox .lbl{font-size:11px;color:#56708c;margin-bottom:1px}
+.lbl{font-size:11px;color:#56708c;margin-bottom:1px}
+.subjsel{font-size:12px;border:1px solid #9cc3e0;padding:2px 4px;background:#fff;font-weight:700;color:#1a1a1a}
 .ex-title{font-weight:700;font-size:16px}
 .ex-mode{font-size:11px;color:#56708c}
 .ex-row2{background:#fff;color:#334;display:flex;align-items:center;gap:10px;padding:2px 16px 8px;flex-wrap:wrap;border-bottom:1px solid #d3dae6}
@@ -148,14 +149,26 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .filter .btn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
 .review .qcard{margin-bottom:14px}
 
-/* ---------- 모달 ---------- */
-.modal-bg{position:fixed;inset:0;background:rgba(10,20,40,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
-.modal{background:#fff;border-radius:10px;max-width:460px;width:100%;padding:22px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
-.modal h3{margin:0 0 10px;color:var(--navy)}
-.modal .body{margin-bottom:16px;line-height:1.6}
-.modal .acts{display:flex;justify-content:flex-end;gap:8px}
+/* ---------- 모달 (윈도우 알림창 스타일) ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(10,20,40,.35);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal{background:#fff;border:1px solid #0a3d7a;border-radius:0;max-width:360px;width:100%;padding:0;box-shadow:0 8px 28px rgba(0,0,0,.35);font-family:"Dotum","돋움",sans-serif}
+.winbar{background:linear-gradient(#4a82c4,#1a4a8a);color:#fff;padding:5px 8px 5px 10px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.winbar .x{cursor:pointer;background:#e2574c;color:#fff;width:17px;height:17px;display:flex;align-items:center;justify-content:center;font-size:10px;border:1px solid #7a2019;flex-shrink:0}
+.modal .mbody{padding:18px 20px;display:flex;gap:12px;align-items:flex-start;line-height:1.6;font-size:13px}
+.modal .micon{font-size:26px;flex-shrink:0}
+.modal .acts{padding:0 20px 16px;display:flex;justify-content:flex-end;gap:6px}
+.modal .acts button{min-width:68px;border:1px solid #6b7688;background:linear-gradient(#fff,#e6eaf0);border-radius:2px;padding:5px 10px;font-size:12px}
 .unans{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
 .unans button{border:1px solid var(--line);background:#fff;border-radius:4px;padding:3px 8px;font-size:13px}
+
+/* ---------- 시험종료 안내창 (리스트박스) ---------- */
+.winbox{position:fixed;z-index:55;top:50%;left:50%;transform:translate(-50%,-50%);width:260px;background:#fff;border:1px solid #0a3d7a;box-shadow:0 8px 28px rgba(0,0,0,.35);font-family:"Dotum","돋움",sans-serif}
+.winbox .wbody{padding:12px 14px;font-size:13px}
+.winbox .listbox{height:130px;overflow:auto;border:1px solid #6b7688;background:#fff;box-shadow:inset 1px 1px 3px rgba(0,0,0,.25);margin:8px 0;padding:2px}
+.winbox .listbox div{padding:2px 6px;cursor:pointer;font-size:13px}
+.winbox .listbox div:hover{background:#2a5db5;color:#fff}
+.winbox .wacts{display:flex;justify-content:flex-end;gap:6px;padding:0 14px 14px}
+.winbox .wacts button{border:1px solid #6b7688;background:linear-gradient(#fff,#e6eaf0);border-radius:2px;padding:5px 12px;font-size:12px}
 
 /* ---------- 계산기 ---------- */
 .calc{position:fixed;z-index:60;width:220px;background:#d7dee8;border:1px solid #8a96ab;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-family:"Consolas","Courier New",monospace}
@@ -230,12 +243,13 @@ let timerId = null;
 let lastResult = null;
 
 // ---------- 모달 ----------
-function modal(title, body, actions){
+function modal(title, body, actions, icon){
   const bg = h('div', {class:'modal-bg'});
   const close = () => bg.remove();
   const box = h('div', {class:'modal'},
-    h('h3', {text:title}),
-    h('div', {class:'body'}, body),
+    h('div', {class:'winbar'}, '대한상공회의소', h('span', {class:'x', onclick:close}, '✕')),
+    h('div', {class:'mbody'}, h('span', {class:'micon', text: icon || '⚠'}),
+      h('div', null, h('b', {text:title}), h('div', {style:'margin-top:6px'}, body))),
     h('div', {class:'acts'}, actions.map(a => h('button', {class:'btn ' + (a.cls || ''), onclick: () => { close(); a.fn && a.fn(); }}, a.label)))
   );
   bg.appendChild(box);
@@ -437,10 +451,17 @@ function renderExam(){
     h('button', {class: prefs.fs === v ? 'on' : null, onclick: () => { prefs.fs = v; savePrefs(); renderExam(); }}, t)));
   const segPer = h('div', {class:'seg'}, [[1,'1문제'],[2,'2문제'],[0,'전체']].map(([v, t]) =>
     h('button', {class: prefs.per === v ? 'on' : null, onclick: () => { prefs.per = v; savePrefs(); renderExam(); }}, t)));
+  const subjInExam = [...new Set(s.qs.map(ref => getQ(ref).subject))].sort();
+  const subjSel = h('select', {class:'subjsel', onchange: e => {
+    const target = +e.target.value;
+    const i = s.qs.findIndex(ref => getQ(ref).subject === target);
+    if (i >= 0) goto(i);
+  }}, subjInExam.map(k => h('option', {value:k, text:`${k}과목 ${SUBJ[k]}`})));
   const row1 = h('div', {class:'ex-row1'},
     h('div', {class:'ex-brand'}, h('span', {class:'dot'}), '컴퓨터활용능력 1급 필기 CBT'),
     h('div', {class:'grow'}),
     h('div', {class:'ex-infobox'}, h('b', {text:s.title}), study ? '학습 모드' : '실전 CBT'),
+    subjInExam.length > 1 ? h('div', {class:'ex-infobox'}, h('div', {class:'lbl', text:'과목명'}), subjSel) : null,
     h('div', {class:'ex-timerbox'}, h('div', {class:'lbl', text: study ? '경과 시간' : '남은 시험시간'}), timerEl));
   const row2 = h('div', {class:'ex-row2'},
     h('div', {class:'ex-tools'}, h('span', {class:'hide-sm', text:'글자크기'}), segFs, h('span', {class:'hide-sm', text:'화면배치'}), segPer),
@@ -468,7 +489,7 @@ function renderExam(){
     prevBtn, pageInfo, nextBtn,
     h('div', {class:'grow'}),
     remainEl,
-    h('button', {class:'btn danger-fill', onclick: confirmSubmit}, '답안 제출'));
+    h('button', {class:'btn danger-fill', onclick: confirmSubmit}, '◇ 시험종료'));
 
   app.append(h('div', {class:'exam'}, head, body, foot));
 
@@ -619,15 +640,31 @@ function renderExam(){
       list.length ? h('div', null, `안 푼 문제 ${list.length}개`, h('div', {class:'unans'}, list.map(i => h('button', {onclick: () => { document.querySelector('.modal-bg').remove(); goto(i); }}, String(i + 1)))))
         : h('div', {text:'모든 문제에 답을 표기했습니다.'}),
       flagged.length ? h('div', {style:'margin-top:12px'}, `★ 표시한 문제 ${flagged.length}개`, h('div', {class:'unans'}, flagged.map(i => h('button', {onclick: () => { document.querySelector('.modal-bg').remove(); goto(i); }}, String(i + 1))))) : null);
-    modal('안 푼 문제', body, [{label:'닫기', cls:'primary'}]);
+    modal('안 푼 문제', body, [{label:'닫기', cls:'primary'}], 'ℹ');
+  }
+  function closeWinbox(){ const w = document.querySelector('.winbox'); if (w) w.remove(); }
+  function openEndWindow(unansIdx){
+    closeWinbox();
+    const win = h('div', {class:'winbox'},
+      h('div', {class:'winbar'}, '시험 종료', h('span', {class:'x', onclick: closeWinbox}, '✕')),
+      h('div', {class:'wbody'},
+        `안푼 갯수 (${unansIdx.length}개)`,
+        h('div', {class:'listbox'}, unansIdx.map(i => h('div', {onclick: () => { closeWinbox(); goto(i); }}, `${i + 1}번 문제`)))),
+      h('div', {class:'wacts'},
+        h('button', {onclick: closeWinbox}, '닫기'),
+        h('button', {onclick: () => { closeWinbox(); finalConfirm(); }}, '시험종료')));
+    document.body.appendChild(win);
+  }
+  function finalConfirm(){
+    modal('시험종료', '답안을 제출하고 시험을 종료하시겠습니까?', [{label:'아니오(N)'}, {label:'예(Y)', cls:'primary', fn: finish}]);
   }
   function confirmSubmit(){
-    const left = total - Object.keys(s.answers).length;
-    modal('답안 제출', left ? `안 푼 문제가 ${left}개 있습니다. 그래도 제출하시겠습니까?` : '답안을 제출하시겠습니까? 제출 후에는 답을 바꿀 수 없습니다.',
-      [{label:'취소'}, {label:'제출', cls:'primary', fn: finish}]);
+    const unansIdx = s.qs.map((_, i) => i).filter(i => s.answers[i] == null);
+    if (unansIdx.length) openEndWindow(unansIdx);
+    else finalConfirm();
   }
   function confirmExit(){
-    modal('홈으로', '현재 풀이 상태는 저장되어 나중에 이어서 풀 수 있습니다.', [{label:'취소'}, {label:'홈으로', cls:'primary', fn: () => { save(); renderHome(); }}]);
+    modal('홈으로', '현재 풀이 상태는 저장되어 나중에 이어서 풀 수 있습니다.', [{label:'아니오(N)'}, {label:'예(Y)', cls:'primary', fn: () => { save(); renderHome(); }}]);
   }
 
   // 타이머
