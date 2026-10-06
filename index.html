@@ -583,8 +583,8 @@ function renderExam(){
     CIRC.forEach((c, ci) => {
       const txt = q.choicesInImage ? h('span', {class:'choice-img-note', text:'(위 그림의 보기 참고)'}) : h('span', {class:'pre', text:q.choices[ci]});
       const li = h('li', {class:'choice',
-        onclick: () => study ? pick(i, ci) : pickTemp(i, ci),
-        oncontextmenu: e => { e.preventDefault(); if (!study) pick(i, ci); }
+        onclick: () => pick(i, ci),
+        oncontextmenu: e => { e.preventDefault(); if (!study) pickTemp(i, ci); }
       }, h('span', {class:'mk', text:String(ci + 1)}), txt);
       ul.appendChild(li);
       q.imgs.filter(im => im.after === ci).forEach(im => ul.appendChild(h('li', {class:'qimgs'}, imgEl(im))));
