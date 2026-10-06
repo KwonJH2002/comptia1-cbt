@@ -10,6 +10,7 @@
   --navy:#1f3a68; --blue:#2e5aa8; --blue-l:#e8eef9; --line:#c9d3e3; --bg:#f3f5f9; --text:#1d2433; --muted:#6a7486;
   --ok:#1f8a4c; --ok-l:#e3f4ea; --ng:#c8322f; --ng-l:#fbe7e6; --warn:#e08a00; --card:#fff;
   --fs:16px;
+  --exam-bg:#dfe6ee; --exam-head:#213a5e; --exam-head2:#15253d; --led:#ff3b30;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
@@ -53,31 +54,41 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .hist td:first-child,.hist th:first-child{text-align:left}
 .pass{color:var(--ok);font-weight:700}.fail{color:var(--ng);font-weight:700}
 
-/* ---------- 시험 화면 ---------- */
-.exam{display:flex;flex-direction:column;height:100vh}
-.ex-head{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 14px;flex-wrap:wrap}
+/* ---------- 시험 화면 (실제 CBT 체험 화면 스타일) ---------- */
+.exam{display:flex;flex-direction:column;height:100vh;background:var(--exam-bg);font-family:"Dotum","돋움","Malgun Gothic",sans-serif}
+.ex-head{display:flex;flex-direction:column}
+.ex-row1{background:linear-gradient(#eef8fd,#cfe8f7);display:flex;align-items:center;gap:14px;padding:8px 16px;flex-wrap:wrap;border-bottom:4px solid;border-image:linear-gradient(90deg,#3a7bd5,#5cb85c,#f0ad4e,#d9534f) 1}
+.ex-brand{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #9cc3e0;border-radius:16px;padding:6px 16px;font-weight:700;color:#1a4a7a;font-size:14px}
+.ex-brand .dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7ec8ff,#1a4a7a)}
+.ex-row1 .grow{flex:1}
+.ex-infobox{background:#fff;border:1px solid #9cc3e0;border-radius:4px;padding:4px 14px;font-size:12px;color:#334;text-align:center}
+.ex-infobox b{display:block;font-size:13px;color:#1a4a7a}
+.ex-timerbox{text-align:center}
+.ex-timerbox .lbl{font-size:11px;color:#56708c;margin-bottom:1px}
 .ex-title{font-weight:700;font-size:16px}
-.ex-mode{font-size:12px;background:rgba(255,255,255,.18);padding:2px 8px;border-radius:10px}
-.ex-head .grow{flex:1}
+.ex-mode{font-size:12px;background:rgba(255,255,255,.18);padding:2px 8px;border-radius:2px;border:1px solid rgba(255,255,255,.3)}
+.ex-row2{background:linear-gradient(#2a4a78,var(--exam-head) 40%,var(--exam-head2));color:#fff;display:flex;align-items:center;gap:14px;padding:6px 14px;flex-wrap:wrap;border-bottom:3px solid #0f1d30}
+.ex-row2 .grow{flex:1}
 .ex-tools{display:flex;gap:6px;align-items:center;font-size:13px}
-.ex-tools .seg{display:flex;border:1px solid rgba(255,255,255,.35);border-radius:5px;overflow:hidden}
-.ex-tools .seg button{background:transparent;color:#fff;border:0;padding:4px 9px;font-size:13px}
-.ex-tools .seg button.on{background:#fff;color:var(--navy);font-weight:700}
-.timer{font-variant-numeric:tabular-nums;font-size:18px;font-weight:700;background:#0f2447;padding:4px 12px;border-radius:5px;min-width:96px;text-align:center}
-.timer.low{color:#ffb4b0}
+.ex-tools .seg{display:flex;border:1px solid #0f2140;border-radius:2px;overflow:hidden;background:#17304f}
+.ex-tools .seg button{background:transparent;color:#cfe0f5;border:0;padding:4px 9px;font-size:13px}
+.ex-tools .seg button.on{background:#f3c23c;color:#1a1a1a;font-weight:700}
+.timer{font-variant-numeric:tabular-nums;font-size:30px;font-weight:700;letter-spacing:1px;color:var(--led);min-width:130px;text-align:center;font-family:"Consolas","Courier New",monospace}
+.timer.low{animation:blink 1s step-start infinite}
+@keyframes blink{50%{opacity:.35}}
 .counts{font-size:13px;opacity:.9}
 .ex-body{flex:1;display:flex;min-height:0}
 .qarea{flex:1;overflow:auto;padding:18px 22px;min-width:0}
-.qgrid{display:grid;gap:18px}
+.qgrid{display:grid;gap:14px}
 .qgrid.cols2{grid-template-columns:1fr 1fr}
-.qcard{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px 20px;font-size:var(--fs);line-height:1.65}
+.qcard{background:#fff;border:1px solid #9aa7bd;border-radius:2px;padding:18px 20px;font-size:var(--fs);line-height:1.65;box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .qcard.cur{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-l)}
-.qsubj{font-size:12px;color:var(--muted);margin-bottom:6px}
+.qsubj{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:700}
 .qstem{font-weight:700;display:flex;gap:6px}
 .qstem .no{flex-shrink:0}
 .qimgs img{display:block;max-width:100%;height:auto;margin:10px 0 4px 22px;border:1px solid #eef1f6}
 .choices{list-style:none;margin:12px 0 0;padding:0}
-.choice{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;border-radius:6px;border:1px solid transparent;cursor:pointer;margin:2px 0}
+.choice{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;border-radius:2px;border:1px solid transparent;cursor:pointer;margin:2px 0}
 .choice:hover{background:#f5f8fd}
 .choice .mk{flex-shrink:0;width:1.5em;height:1.5em;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid #8a95a8;font-size:.85em;margin-top:.1em;font-weight:700;color:#4a5569}
 .choice.sel{background:var(--blue-l);border-color:#b7c8ea}
@@ -97,23 +108,29 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .qactions .btn{padding:4px 10px;font-size:13px}
 .flag-on{color:var(--warn);border-color:var(--warn)}
 
-.omr{width:250px;flex-shrink:0;background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column}
-.omr h3{margin:0;padding:10px 12px;font-size:14px;background:var(--blue-l);color:var(--navy);border-bottom:1px solid var(--line)}
-.omr-list{overflow:auto;flex:1;padding:4px 6px 10px}
-.omr-sub{font-size:12px;color:var(--muted);padding:8px 4px 3px;font-weight:700}
-.omr-row{display:flex;align-items:center;gap:3px;padding:2px 4px;border-radius:4px}
-.omr-row.cur{background:#fff3d6}
-.omr-row .n{width:26px;text-align:right;font-size:12px;color:#4a5569;cursor:pointer;padding-right:4px;font-variant-numeric:tabular-nums}
-.omr-row .n.flag{color:var(--warn);font-weight:700}
-.omr-row button{width:24px;height:22px;border-radius:11px;border:1px solid #a9b4c6;background:#fff;font-size:11px;padding:0;color:#4a5569}
-.omr-row button.sel{background:#222;color:#fff;border-color:#222}
+.omr{width:260px;flex-shrink:0;background:#fff;border-left:2px solid #9aa7bd;display:flex;flex-direction:column}
+.omr h3{margin:0;padding:10px 12px;font-size:15px;background:#fff;color:#1a4a7a;border-bottom:2px solid #9cc3e0;letter-spacing:2px;text-align:center;font-weight:700}
+.omr-list{overflow:auto;flex:1;padding:6px 10px 10px}
+.omr-sub{font-size:12px;color:#fff;padding:4px 6px;font-weight:700;background:#5c7aa8;margin-top:6px;border-radius:2px}
+.omr-row{display:flex;align-items:center;gap:6px;padding:3px 4px;border-bottom:1px dotted #d3dae6}
+.omr-row.cur{background:#fff3c4}
+.omr-row .n{width:20px;text-align:right;font-size:12px;color:#1d2433;cursor:pointer;font-variant-numeric:tabular-nums;font-weight:700}
+.omr-row .n.flag{color:var(--ng);font-weight:700}
+.omr-row button{width:21px;height:21px;border-radius:50%;border:1.5px solid #5a6b85;background:#fff;font-size:10px;padding:0;color:#4a5569;font-weight:700}
+.omr-row button.sel{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
 .omr-row button.correct{background:var(--ok);border-color:var(--ok);color:#fff}
 .omr-row button.wrong{background:var(--ng);border-color:var(--ng);color:#fff}
 .omr-row button.answer{box-shadow:0 0 0 2px var(--ok) inset}
 
-.ex-foot{background:#fff;border-top:1px solid var(--line);display:flex;gap:8px;padding:8px 14px;align-items:center;flex-wrap:wrap}
+.ex-foot{background:linear-gradient(#eef8fd,#cfe8f7);border-top:2px solid #9cc3e0;display:flex;gap:8px;padding:10px 14px;align-items:center;flex-wrap:wrap}
 .ex-foot .grow{flex:1}
+.ex-foot .btn{border-radius:2px;border:1px solid #8a96ab;background:linear-gradient(#fff,#e6eaf0)}
+.ex-foot .navbtn{border-radius:16px;border:1px solid #15253d;background:linear-gradient(#3a5c8c,#213a5e);color:#fff;padding:7px 18px;font-weight:700;font-size:13px}
+.ex-foot .navbtn:disabled{opacity:.4}
+.ex-foot .btn.danger-fill{background:linear-gradient(#e2574c,#b8352b);border-color:#7a2019;color:#fff;font-weight:700}
+.remain{font-size:13px;color:#1a4a7a;font-weight:700}
 .pageinfo{color:var(--muted);font-size:13px}
+.calc-btn{display:flex;align-items:center;gap:5px}
 
 /* ---------- 결과 ---------- */
 .res{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
@@ -137,6 +154,18 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .modal .acts{display:flex;justify-content:flex-end;gap:8px}
 .unans{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
 .unans button{border:1px solid var(--line);background:#fff;border-radius:4px;padding:3px 8px;font-size:13px}
+
+/* ---------- 계산기 ---------- */
+.calc{position:fixed;z-index:60;width:220px;background:#d7dee8;border:1px solid #8a96ab;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-family:"Consolas","Courier New",monospace}
+.calc-head{background:linear-gradient(#3a5c8c,#213a5e);color:#fff;padding:6px 10px;font-size:12px;font-weight:700;display:flex;justify-content:space-between;align-items:center;cursor:move;border-radius:4px 4px 0 0}
+.calc-head button{background:transparent;border:0;color:#fff;font-size:14px;line-height:1;padding:0 4px}
+.calc-disp{margin:8px;background:#0a1626;color:#8fffb0;font-size:22px;text-align:right;padding:8px 10px;border-radius:2px;min-height:1.4em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:0 8px 8px}
+.calc-grid button{height:34px;border:1px solid #8a96ab;border-radius:3px;background:linear-gradient(#fff,#e6eaf0);font-size:14px;font-family:inherit}
+.calc-grid button:active{background:#c9d3e3}
+.calc-grid button.op{background:linear-gradient(#5c7aa8,#3a5c8c);color:#fff}
+.calc-grid button.eq{background:linear-gradient(#e0b84a,#c69a2e);color:#1a1a1a;grid-row:span 1}
+.calc-grid button.zero{grid-column:span 2}
 
 @media (max-width:820px){
   .omr{display:none}
@@ -214,10 +243,57 @@ function modal(title, body, actions){
   return close;
 }
 
+// ---------- 계산기 ----------
+let calcEl = null;
+function toggleCalc(){
+  if (calcEl){ calcEl.remove(); calcEl = null; return; }
+  let expr = '';
+  const disp = h('div', {class:'calc-disp', text:'0'});
+  function render(){ disp.textContent = expr === '' ? '0' : expr; }
+  function press(v){
+    if (v === 'C'){ expr = ''; }
+    else if (v === '←'){ expr = expr.slice(0, -1); }
+    else if (v === '='){
+      try { if (!/^[-+*/.0-9()\s]+$/.test(expr)) throw 0; const r = Function('"use strict";return (' + expr + ')')(); expr = String(Math.round((r + Number.EPSILON) * 1e10) / 1e10); }
+      catch(e){ expr = 'Error'; }
+    } else expr = (expr === 'Error' ? '' : expr) + v;
+    render();
+  }
+  const keys = ['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+'];
+  const grid = h('div', {class:'calc-grid'});
+  keys.forEach(k => {
+    const btn = h('button', {class: '*/+-'.includes(k) ? 'op' : (k === '=' ? 'eq' : null), onclick: () => press(k)}, k);
+    if (k === '0') btn.classList.add('zero');
+    grid.appendChild(btn);
+  });
+  const topRow = h('div', {class:'calc-grid', style:'grid-template-columns:1fr 1fr'},
+    h('button', {class:'op', onclick: () => press('C')}, 'C'),
+    h('button', {class:'op', onclick: () => press('←')}, '←'));
+  calcEl = h('div', {class:'calc', style:'top:120px;right:280px'},
+    h('div', {class:'calc-head'}, '계산기', h('button', {onclick: toggleCalc}, '✕')),
+    disp, topRow, grid);
+  document.body.appendChild(calcEl);
+  // 드래그 이동
+  const headEl = calcEl.querySelector('.calc-head');
+  let drag = null;
+  headEl.addEventListener('mousedown', e => {
+    const r = calcEl.getBoundingClientRect();
+    drag = {dx: e.clientX - r.left, dy: e.clientY - r.top};
+  });
+  document.addEventListener('mousemove', e => {
+    if (!drag || !calcEl) return;
+    calcEl.style.left = (e.clientX - drag.dx) + 'px';
+    calcEl.style.top = (e.clientY - drag.dy) + 'px';
+    calcEl.style.right = 'auto';
+  });
+  document.addEventListener('mouseup', () => { drag = null; });
+}
+
 // ================= 홈 =================
 function renderHome(){
   stopTimer();
   document.onkeydown = null;
+  if (calcEl){ calcEl.remove(); calcEl = null; }
   app.innerHTML = '';
   const hist = store.get('history', []);
   const wrong = store.get('wrong', {});
@@ -359,30 +435,37 @@ function renderExam(){
     h('button', {class: prefs.fs === v ? 'on' : null, onclick: () => { prefs.fs = v; savePrefs(); renderExam(); }}, t)));
   const segPer = h('div', {class:'seg'}, [[1,'1문제'],[2,'2문제'],[0,'전체']].map(([v, t]) =>
     h('button', {class: prefs.per === v ? 'on' : null, onclick: () => { prefs.per = v; savePrefs(); renderExam(); }}, t)));
-  const head = h('div', {class:'ex-head'},
-    h('div', {class:'ex-title', text:s.title}),
-    h('span', {class:'ex-mode', text: study ? '학습 모드' : '실전 CBT'}),
+  const row1 = h('div', {class:'ex-row1'},
+    h('div', {class:'ex-brand'}, h('span', {class:'dot'}), '컴퓨터활용능력 1급 필기 CBT'),
     h('div', {class:'grow'}),
+    h('div', {class:'ex-infobox'}, h('b', {text:s.title}), study ? '학습 모드' : '실전 CBT'),
+    h('div', {class:'ex-timerbox'}, h('div', {class:'lbl', text: study ? '경과 시간' : '남은 시험시간'}), timerEl));
+  const row2 = h('div', {class:'ex-row2'},
     h('div', {class:'ex-tools'}, h('span', {class:'hide-sm', text:'글자크기'}), segFs, h('span', {class:'hide-sm', text:'화면배치'}), segPer),
-    countsEl, timerEl);
+    h('div', {class:'grow'}),
+    countsEl);
+  const head = h('div', {class:'ex-head'}, row1, row2);
 
   // 본문
   const qarea = h('div', {class:'qarea'});
   const omrList = h('div', {class:'omr-list'});
-  const omr = h('div', {class:'omr'}, h('h3', {text:'답안 표기란'}), omrList);
+  const omr = h('div', {class:'omr'}, h('h3', {text:'답 안 지'}), omrList);
   const body = h('div', {class:'ex-body'}, qarea, omr);
 
   // 하단
   const pageInfo = h('span', {class:'pageinfo'});
-  const prevBtn = h('button', {class:'btn', onclick: () => move(-1)}, '◀ 이전');
-  const nextBtn = h('button', {class:'btn', onclick: () => move(1)}, '다음 ▶');
+  const remainEl = h('span', {class:'remain'});
+  const prevBtn = h('button', {class:'navbtn', onclick: () => move(-1)}, '◀ 이전 페이지');
+  const nextBtn = h('button', {class:'navbtn', onclick: () => move(1)}, '다음 페이지 ▶');
   const foot = h('div', {class:'ex-foot'},
     h('button', {class:'btn', onclick: confirmExit}, '홈으로'),
+    h('button', {class:'btn calc-btn', onclick: toggleCalc}, '🖩 계산기'),
     h('button', {class:'btn', onclick: showUnanswered}, '안 푼 문제'),
     h('div', {class:'grow'}),
     prevBtn, pageInfo, nextBtn,
     h('div', {class:'grow'}),
-    h('button', {class:'btn primary', onclick: confirmSubmit}, '답안 제출'));
+    remainEl,
+    h('button', {class:'btn danger-fill', onclick: confirmSubmit}, '답안 제출'));
 
   app.append(h('div', {class:'exam'}, head, body, foot));
 
@@ -425,6 +508,7 @@ function renderExam(){
       extra = ` · 맞힘 ${ok}/${rev.length}`;
     }
     countsEl.textContent = `전체 ${total} · 안 푼 문제 ${total - done}${extra}`;
+    remainEl.textContent = `남은 문항 수 : ${total - done}`;
   }
 
   // 문제 카드
@@ -616,6 +700,7 @@ function explBlock(q, a){
 
 function renderResult(){
   document.onkeydown = null;
+  if (calcEl){ calcEl.remove(); calcEl = null; }
   const {s, g} = lastResult;
   app.innerHTML = '';
   const top = h('div', {class:'topbar'}, h('h1', {text:'채점 결과'}), h('span', {class:'sub', text:s.title}));
