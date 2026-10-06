@@ -80,8 +80,9 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 .ex-body{flex:1;display:flex;min-height:0}
 .qarea{flex:1;overflow:auto;padding:14px 20px;min-width:0;background:#fff}
 .qgrid{display:grid;gap:0}
-.qgrid.cols2{grid-template-columns:1fr 1fr;gap:0 24px}
-.qcard{background:#fff;border:0;border-bottom:1px solid #e9ecf2;border-radius:0;padding:14px 2px;font-size:var(--fs);line-height:1.75;box-shadow:none}
+.qgrid.cols2{display:flex;gap:0 24px;align-items:flex-start}
+.qcol{flex:1;min-width:0;display:flex;flex-direction:column}
+.qcard{background:#fff;border:0;border-bottom:1px solid #e9ecf2;border-radius:0;padding:10px 2px;font-size:var(--fs);line-height:1.55;box-shadow:none}
 .qcard.cur{background:#fffef0}
 .qsubj{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:700}
 .qstem{font-weight:700;display:flex;gap:6px}
@@ -181,7 +182,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer}
 
 @media (max-width:820px){
   .omr{display:none}
-  .qgrid.cols2{grid-template-columns:1fr}
+  .qgrid.cols2{flex-direction:column}
   .qarea{padding:12px}
   .ex-tools .hide-sm{display:none}
 }
@@ -598,9 +599,20 @@ function renderExam(){
     for (const k in cards) delete cards[k];
     const p = pageOf(s.cur);
     const from = per === 0 ? 0 : p * per, to = per === 0 ? total : Math.min(total, from + per);
-    const grid = h('div', {class:'qgrid' + (per === 2 ? ' cols2' : '')});
-    for (let i = from; i < to; i++){ cards[i] = questionCard(i); grid.appendChild(cards[i]); }
-    qarea.appendChild(grid);
+    const idxs = []; for (let i = from; i < to; i++) idxs.push(i);
+    let container;
+    if (per > 1){
+      // 실제 CBT처럼 왼쪽 열을 먼저 채우고 오른쪽 열로 넘어가는 2단 배치 (좌: 7,8 / 우: 9,10 식)
+      const half = Math.ceil(idxs.length / 2);
+      const colL = h('div', {class:'qcol'}), colR = h('div', {class:'qcol'});
+      idxs.slice(0, half).forEach(i => { cards[i] = questionCard(i); colL.appendChild(cards[i]); });
+      idxs.slice(half).forEach(i => { cards[i] = questionCard(i); colR.appendChild(cards[i]); });
+      container = h('div', {class:'qgrid cols2'}, colL, colR);
+    } else {
+      container = h('div', {class:'qgrid'});
+      idxs.forEach(i => { cards[i] = questionCard(i); container.appendChild(cards[i]); });
+    }
+    qarea.appendChild(container);
     pageInfo.textContent = per === 0 ? `${s.cur + 1} / ${total}` : `${p + 1} / ${pages} 페이지`;
     prevBtn.disabled = per === 0 ? s.cur === 0 : p === 0;
     nextBtn.disabled = per === 0 ? s.cur === total - 1 : p === pages - 1;
